@@ -77,7 +77,7 @@ export function Chessboard({
   onEgg?: (key: PieceKey) => void;
   className?: string;
 }) {
-  const pieces = useMemo(() => parse(STAGES[Math.min(stage, STAGES.length - 1)]), [stage]);
+  const pieces = useMemo(() => parse(STAGES[Math.min(stage, STAGES.length - 1)]!), [stage]);
   const files = "abcdefgh".split("");
 
   return (
@@ -102,9 +102,9 @@ export function Chessboard({
       </div>
 
       {pieces.map(({ sq, code }) => {
-        const file = files.indexOf(sq[0]);
+        const file = files.indexOf(sq[0]!);
         const rank = Number(sq[1]);
-        const key = NAME[code.toLowerCase()];
+        const key = NAME[code.toLowerCase()]!;
         const white = code === code.toUpperCase();
         return (
           <button
