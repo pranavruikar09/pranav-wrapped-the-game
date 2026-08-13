@@ -86,6 +86,13 @@ export const content = {
     scaleLeft: "WINNING",
     scaleRight: "GETTING BETTER",
     text: "[YOUR ACTUAL RELATIONSHIP WITH COMPETITION — where the needle really sits and what that costs you.]",
+    /** Text shown as the viewer drags the needle. Four honest positions, left → right. */
+    zones: [
+      "[WHAT IT LOOKS LIKE WHEN I ONLY WANT TO WIN]",
+      "[MOSTLY WINNING, A LITTLE LEARNING]",
+      "[WHERE THE NEEDLE ACTUALLY SITS MOST DAYS]",
+      "[WHAT IT LOOKS LIKE WHEN I ONLY WANT TO IMPROVE]",
+    ],
     stats: [
       { label: "FAVOURITE FEELING", value: "[TEXT]" },
       { label: "LEAST FAVOURITE FEELING", value: "[TEXT]" },
