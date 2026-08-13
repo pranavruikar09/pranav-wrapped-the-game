@@ -1,24 +1,28 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Story } from "@/components/wrapped/Story";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "Pranav Wrapped — The Chess Edition" },
+      {
+        name: "description",
+        content:
+          "An interactive creative CV: a personal story told as a chess game, one move at a time. Opening, development, attack, blunder, endgame.",
+      },
+      { property: "og:title", content: "Pranav Wrapped — The Chess Edition" },
+      {
+        property: "og:description",
+        content:
+          "Not a résumé. A scroll-driven story about the player behind it — passions, competition, beauty and one very repeatable blunder.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
+  return <Story />;
 }
