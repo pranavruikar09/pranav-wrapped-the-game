@@ -83,7 +83,7 @@ export function Chessboard({
   return (
     <div
       className={`relative ${className}`}
-      style={{ width: size, height: size }}
+      style={{ width: size, height: size, containerType: "size" }}
       aria-label="Chessboard illustrating the current chapter of the story"
     >
       <div className="absolute inset-0 grid grid-cols-8 grid-rows-8 overflow-hidden rounded-md border border-border">
@@ -128,10 +128,9 @@ export function Chessboard({
               height: "12.5%",
               left: `${file * 12.5}%`,
               top: `${(8 - rank) * 12.5}%`,
-              fontSize: "9cqw",
             }}
           >
-            <span style={{ fontSize: "clamp(1rem, 7vmin, 2.4rem)" }}>{GLYPH[code]}</span>
+            <span style={{ fontSize: "9cqw", lineHeight: 1 }}>{GLYPH[code]}</span>
           </button>
         );
       })}
