@@ -16,7 +16,20 @@ export function useReveal<T extends HTMLElement = HTMLDivElement>() {
 
   useEffect(() => {
     const raf = requestAnimationFrame(() => setShown(true));
-    return () => cancelAnimationFrame(raf);
+    /**
+     * Safety net: browsers pause rAF entirely for a backgrounded/non-composited
+     * document, so an element that mounts while the tab isn't visible would
+     * otherwise stay permanently un-revealed (`shown` never flips, so it's
+     * stuck at its hidden opacity-0 state forever). setTimeout still fires
+     * in the background — throttled, but it fires — so this guarantees the
+     * element becomes visible either way. setShown is idempotent, so having
+     * both race is harmless; rAF wins the common (visible-tab) case.
+     */
+    const timeout = window.setTimeout(() => setShown(true), 50);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.clearTimeout(timeout);
+    };
   }, []);
 
   return { ref, shown };

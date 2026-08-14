@@ -160,7 +160,7 @@ export const content = {
         text: "I tend to ask one more question than necessary. Sometimes that leads somewhere useful. Sometimes it leads to a 20-minute rabbit hole.",
       },
       {
-        trait: "ADAPTABLE",
+        trait: "RESILIENT",
         text: "[WHY THIS TRAIT — one or two honest sentences about landing in new places/situations and adjusting fast.]",
       },
     ],
@@ -256,44 +256,38 @@ export const content = {
     }[],
   },
 
-  competitive: {
-    chapter: "ATTACK",
-    title: "I LIKE COMPETING.",
-    subtitle: "But it took me a while to work out why.",
-    /** 0 = purely winning · 100 = purely getting better. Move the needle honestly. */
-    scale: 62,
-    scaleLeft: "WINNING",
-    scaleRight: "GETTING BETTER",
-    text: "[YOUR ACTUAL RELATIONSHIP WITH COMPETITION — where the needle really sits and what that costs you.]",
-    /** Text shown as the viewer drags the needle. Four honest positions, left → right. */
-    zones: [
-      "[WHAT IT LOOKS LIKE WHEN I ONLY WANT TO WIN]",
-      "[MOSTLY WINNING, A LITTLE LEARNING]",
-      "[WHERE THE NEEDLE ACTUALLY SITS MOST DAYS]",
-      "[WHAT IT LOOKS LIKE WHEN I ONLY WANT TO IMPROVE]",
-    ],
-    stats: [
-      { label: "FAVOURITE FEELING", value: "[TEXT]" },
-      { label: "LEAST FAVOURITE FEELING", value: "[TEXT]" },
-      { label: "LESSON LEARNED", value: "[TEXT]" },
-    ],
-  },
-
+  /**
+   * Beauty begins at home: three people, one quality each. Not a corporate
+   * beauty-brand page — this is personal. `label` is the small eyebrow above
+   * the hero heading; the heading itself and the closing statement are
+   * hardcoded in Story.tsx (their accent words are styled per-word, same
+   * pattern as every other big headline in this file).
+   */
   beauty: {
     chapter: "SACRIFICE",
-    title: "BEAUTY, ACCORDING TO PRANAV",
-    used_to_think: "[WHAT YOU USED TO THINK BEAUTY WAS — be specific, even if it's unflattering.]",
-    now_think: "[WHAT YOU THINK NOW — and what changed your mind.]",
-    definitions: [
-      { concept: "[CONCEPT 1]", text: "[PERSONAL EXPLANATION]" },
-      { concept: "[CONCEPT 2]", text: "[PERSONAL EXPLANATION]" },
-      { concept: "[CONCEPT 3]", text: "[PERSONAL EXPLANATION]" },
-    ],
-    memory: {
-      label: "PHOTO — PERSONAL MEMORY",
-      src: "",
-      caption: "[the moment this section is actually about]",
-    } as Photo,
+    label: "WHAT BEAUTY MEANS TO ME",
+    subtitle: "The first people who shaped me. The reasons I believe in who I am.",
+    mother: {
+      relation: "MY MOTHER",
+      trait: "COURAGE",
+      quote:
+        "She has faced every challenge with a quiet strength that never needed an audience. Her courage is what I think of whenever things feel uncertain.",
+      photo: { label: "PHOTO — MOTHER", src: "" } as Photo,
+    },
+    father: {
+      relation: "MY FATHER",
+      trait: "INTEGRITY",
+      quote:
+        "He taught me that doing the right thing matters even when nobody is watching. His integrity is one of the standards I try to carry with me.",
+      photo: { label: "PHOTO — FATHER", src: "" } as Photo,
+    },
+    brother: {
+      relation: "MY BROTHER",
+      trait: "HELPING NATURE",
+      quote:
+        "He's the first to show up when someone needs help, without ever making a big deal out of it. His instinct to help is something I genuinely admire.",
+      photo: { label: "PHOTO — BROTHER", src: "" } as Photo,
+    },
   },
 
   loreal: {

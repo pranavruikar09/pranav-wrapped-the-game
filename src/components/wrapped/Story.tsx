@@ -12,7 +12,6 @@ import { playTick, setSoundEnabled } from "./sound";
 type ChapterId =
   | "player"
   | "passions"
-  | "attack"
   | "beauty"
   | "loreal"
   | "blunder"
@@ -23,7 +22,6 @@ type ChapterId =
 const CHAPTER_ORDER: ChapterId[] = [
   "player",
   "passions",
-  "attack",
   "beauty",
   "loreal",
   "blunder",
@@ -34,12 +32,11 @@ const CHAPTER_ORDER: ChapterId[] = [
 const CHAPTER_LABELS = [
   "01 PLAYER",
   "02 PASSIONS",
-  "03 COMPETITION",
-  "04 BEAUTY",
-  "05 MATCH",
-  "06 BLUNDER",
-  "07 WRAPPED",
-  "08 ENDGAME",
+  "03 BEAUTY",
+  "04 MATCH",
+  "05 BLUNDER",
+  "06 WRAPPED",
+  "07 ENDGAME",
 ];
 
 /** Chessboard sizing shared by every full-screen state — bounded by both
@@ -180,8 +177,6 @@ function ChapterScreen({
       return <Player onNext={onNext} onPrev={onPrev} />;
     case "passions":
       return <Passions onNext={onNext} onPrev={onPrev} />;
-    case "attack":
-      return <Attack onNext={onNext} onPrev={onPrev} />;
     case "beauty":
       return <Beauty onNext={onNext} onPrev={onPrev} />;
     case "loreal":
@@ -1191,164 +1186,144 @@ function Passions({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }
   );
 }
 
-/* ─────────────────────────── 03 ATTACK ─────────────────────────── */
+/* ─────────────────────────── 03 BEAUTY ─────────────────────────── */
 
-function Attack({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) {
-  const c = content.competitive;
-  const [val, setVal] = useState(c.scale);
-  return (
-    <ChapterLayout
-      id="attack"
-      header={<ChapterTag chapter={c.chapter} move="MOVE 03" />}
-      footer={<MoveNav onPrev={onPrev} onNext={onNext} />}
-    >
-      <div className="grid gap-6 lg:grid-cols-2 lg:items-center">
-        <div>
-          <Reveal>
-            <h2 className="font-display text-[clamp(2rem,6vw,3.75rem)] uppercase leading-[0.88]">
-              {c.title}
-            </h2>
-          </Reveal>
-          <Reveal delay={100}>
-            <p className="mt-2 text-sm text-muted-foreground sm:text-base">{c.subtitle}</p>
-          </Reveal>
-          <Reveal delay={180}>
-            <p className="mt-3 max-w-lg text-base leading-relaxed sm:text-lg">{c.text}</p>
-          </Reveal>
-        </div>
-
-        <div>
-          <Reveal>
-            <div className="rounded-2xl border border-border bg-card p-4 sm:p-5">
-              <div className="font-mono text-sm tracking-[0.2em] text-accent">WHY I COMPETE</div>
-              <div className="mt-4 flex items-center justify-between font-display text-sm uppercase">
-                <span>{c.scaleLeft}</span>
-                <span>{c.scaleRight}</span>
-              </div>
-              <input
-                type="range"
-                min={0}
-                max={100}
-                value={val}
-                onChange={(e) => setVal(Number(e.target.value))}
-                aria-label="Why I compete: winning versus getting better"
-                className="mt-3 w-full accent-accent"
-              />
-              <p className="mt-3 text-center font-mono text-sm tracking-[0.15em] text-muted-foreground">
-                {val}% GETTING BETTER · {100 - val}% WINNING
-              </p>
-            </div>
-          </Reveal>
-
-          <div className="mt-3 space-y-2">
-            {c.stats.map((s, i) => (
-              <Reveal key={s.label} delay={i * 80}>
-                <div className="flex flex-col gap-0.5 rounded-xl border border-border p-3 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
-                  <span className="font-mono text-sm tracking-[0.2em] text-muted-foreground">
-                    {s.label}
-                  </span>
-                  <span className="font-display text-base uppercase sm:text-right">{s.value}</span>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </div>
-    </ChapterLayout>
-  );
+/** Small line-art icon per family member — same visual language as PassionIcon. */
+function FamilyIcon({ kind }: { kind: "heart" | "shield" | "hands" }) {
+  const common = {
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.6,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+    className: "h-full w-full",
+  };
+  switch (kind) {
+    case "heart":
+      return (
+        <svg {...common} aria-hidden>
+          <path d="M12 20.2c-4.4-2.9-8-6.2-8-10A4.6 4.6 0 0 1 12 7.3 4.6 4.6 0 0 1 20 10.2c0 3.8-3.6 7.1-8 10Z" />
+        </svg>
+      );
+    case "shield":
+      return (
+        <svg {...common} aria-hidden>
+          <path d="M12 3.5 19 6v6c0 4.5-3 7.7-7 8.5-4-.8-7-4-7-8.5V6l7-2.5Z" />
+          <path d="m9 12 2 2 4-4.2" />
+        </svg>
+      );
+    case "hands":
+      return (
+        <svg {...common} aria-hidden>
+          <path d="M2 13 6 9l3 1.5L12 8l3 2.5 3-1.5 4 4" />
+          <path d="M9 10.5 12 13l3-2.5" />
+        </svg>
+      );
+  }
 }
 
-/* ─────────────────────────── 04 BEAUTY ─────────────────────────── */
+type FamilyMember = (typeof content.beauty)["mother"];
+
+function FamilyCard({
+  person,
+  icon,
+  featured,
+}: {
+  person: FamilyMember;
+  icon: "heart" | "shield" | "hands";
+  featured?: boolean;
+}) {
+  return (
+    <div
+      className={`group relative flex h-full flex-col rounded-2xl border p-3 transition-all duration-300 hover:-translate-y-1 sm:p-4 ${
+        featured
+          ? "border-accent/50 bg-secondary lg:scale-[1.04]"
+          : "border-border/80 bg-secondary/70 hover:border-accent/50"
+      }`}
+    >
+      <div className="flex items-center gap-2">
+        <span
+          className={`grid h-6 w-6 shrink-0 place-items-center rounded-full border p-1.5 text-accent transition-transform duration-300 group-hover:scale-110 ${
+            featured ? "border-accent/60" : "border-accent/30"
+          }`}
+        >
+          <FamilyIcon kind={icon} />
+        </span>
+        <span className="font-mono text-[0.65rem] tracking-[0.25em] text-muted-foreground">
+          {person.relation}
+        </span>
+      </div>
+      <h3 className="mt-1.5 font-display text-xl uppercase leading-none tracking-tight text-foreground transition-colors duration-300 group-hover:text-accent sm:text-2xl">
+        {person.trait}
+      </h3>
+
+      <PhotoSlot
+        photo={person.photo}
+        ratio="aspect-[4/5]"
+        className="mx-auto mt-2 max-w-[6.5rem] transition-transform duration-300 group-hover:scale-[1.02] sm:max-w-[7.5rem]"
+      />
+
+      <p className="relative mt-2 flex-1 text-[0.78rem] leading-snug text-foreground/75 transition-colors duration-300 group-hover:text-foreground/90 sm:text-[0.85rem]">
+        &ldquo;{person.quote}&rdquo;
+      </p>
+    </div>
+  );
+}
 
 function Beauty({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) {
   const c = content.beauty;
-  const [activeConcept, setActiveConcept] = useState(0);
-  const def = c.definitions[activeConcept]!;
+
   return (
     <ChapterLayout
       id="beauty"
-      className="bg-cream text-cream-foreground"
-      header={
-        <Reveal className="flex items-center gap-3">
-          <span className="h-px w-8 bg-cream-foreground/40" />
-          <span className="font-mono text-sm tracking-[0.3em]">{c.chapter}</span>
-          <span className="font-mono text-sm tracking-[0.3em] opacity-50">MOVE 04</span>
-        </Reveal>
-      }
-      footer={<MoveNav onPrev={onPrev} onNext={onNext} tone="cream" />}
+      header={<ChapterTag chapter={c.chapter} move="MOVE 03" />}
+      footer={<MoveNav onPrev={onPrev} onNext={onNext} />}
     >
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-        <div className="float-slow absolute -right-24 top-16 h-72 w-72 rounded-full border border-cream-foreground/15" />
-        <div className="float-slow absolute -left-16 bottom-10 h-52 w-52 rounded-full bg-cream-foreground/[0.04]" />
-      </div>
-      <div className="relative">
-        <Reveal>
-          <h2 className="max-w-4xl font-display text-[clamp(1.75rem,5.5vw,3.25rem)] uppercase leading-[0.9]">
-            {c.title}
-          </h2>
-        </Reveal>
-
-        <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_1fr]">
-          <div className="max-w-md space-y-2">
-            <Reveal>
-              <div className="border-l-2 border-cream-foreground/30 pl-4">
-                <div className="font-mono text-sm tracking-[0.2em] opacity-60">
-                  I USED TO THINK…
-                </div>
-                <p className="mt-1 text-base leading-snug sm:text-lg">{c.used_to_think}</p>
-              </div>
-            </Reveal>
-            <Reveal delay={140}>
-              <p className="pl-4 font-mono text-sm tracking-[0.2em] opacity-50">BUT THEN.</p>
-            </Reveal>
-            <Reveal delay={220}>
-              <div className="border-l-2 border-cream-foreground pl-4">
-                <div className="font-mono text-sm tracking-[0.2em]">NOW I THINK…</div>
-                <p className="mt-1 text-base leading-snug sm:text-lg">{c.now_think}</p>
-              </div>
-            </Reveal>
-          </div>
-
-          <div>
-            <Reveal delay={160} className="flex flex-wrap gap-2">
-              {c.definitions.map((d, i) => (
-                <button
-                  key={d.concept}
-                  type="button"
-                  onClick={() => setActiveConcept(i)}
-                  aria-pressed={i === activeConcept}
-                  className={`rounded-full border px-4 py-1.5 font-display text-sm uppercase tracking-wide transition-colors ${
-                    i === activeConcept
-                      ? "border-cream-foreground bg-cream-foreground text-cream"
-                      : "border-cream-foreground/30 hover:border-cream-foreground"
-                  }`}
-                >
-                  {d.concept}
-                </button>
-              ))}
-            </Reveal>
-
-            <Reveal
-              key={activeConcept}
-              className="mt-3 max-w-md border-t border-cream-foreground/20 pt-3"
-            >
-              <h3 className="font-display text-xl uppercase leading-none">
-                <span className="opacity-40">BEAUTY =</span> {def.concept}
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed opacity-80">{def.text}</p>
-            </Reveal>
-
-            <Reveal delay={100} className="mt-3 max-w-[9rem]">
-              <PhotoSlot photo={c.memory} ratio="aspect-[3/2]" />
-            </Reveal>
-          </div>
+      <div className="mx-auto flex h-full min-h-0 w-full max-w-6xl flex-col gap-3">
+        <div className="shrink-0 text-center">
+          <Reveal>
+            <p className="font-mono text-sm tracking-[0.3em] text-muted-foreground">{c.label}</p>
+          </Reveal>
+          <Reveal delay={80}>
+            <h2 className="mt-1 font-display text-[clamp(1.75rem,5.5vw,3.5rem)] uppercase leading-[0.92]">
+              BEAUTY BEGINS AT <span className="text-accent">HOME.</span>
+            </h2>
+          </Reveal>
+          <Reveal delay={140}>
+            <p className="mx-auto mt-1 max-w-2xl text-sm text-foreground/80 sm:text-base">
+              {c.subtitle}
+            </p>
+          </Reveal>
         </div>
+
+        <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 sm:grid-cols-3 sm:items-center sm:gap-4">
+          <Reveal delay={200} className="h-full min-h-0">
+            <FamilyCard person={c.mother} icon="heart" />
+          </Reveal>
+          <Reveal delay={280} className="h-full min-h-0">
+            <FamilyCard person={c.father} icon="shield" featured />
+          </Reveal>
+          <Reveal delay={360} className="h-full min-h-0">
+            <FamilyCard person={c.brother} icon="hands" />
+          </Reveal>
+        </div>
+
+        <Reveal delay={480} className="shrink-0 text-center">
+          <p className="font-mono text-sm uppercase tracking-[0.2em] text-foreground/90">
+            THEY ARE MY DEFINITION OF <span className="text-accent">BEAUTY.</span>
+          </p>
+          <p className="mt-0.5 text-sm text-foreground/70 sm:text-base">
+            Not because they are perfect, but because they are{" "}
+            <span className="text-accent">real.</span>
+          </p>
+        </Reveal>
       </div>
     </ChapterLayout>
   );
 }
 
-/* ─────────────────────────── 05 L'ORÉAL MATCH ─────────────────────────── */
+/* ─────────────────────────── 04 L'ORÉAL MATCH ─────────────────────────── */
 
 function Loreal({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) {
   const c = content.loreal;
@@ -1360,7 +1335,7 @@ function Loreal({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) 
       header={
         <Reveal>
           <span className="font-mono text-sm tracking-[0.3em] text-accent">
-            BRAND MATCH · MOVE 05
+            BRAND MATCH · MOVE 04
           </span>
         </Reveal>
       }
@@ -1422,7 +1397,7 @@ function Loreal({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) 
   );
 }
 
-/* ─────────────────────────── 06 THE BLUNDER ─────────────────────────── */
+/* ─────────────────────────── 05 THE BLUNDER ─────────────────────────── */
 
 function Blunder({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) {
   const c = content.blunder;
@@ -1431,7 +1406,7 @@ function Blunder({ onNext, onPrev }: { onNext: () => void; onPrev: () => void })
   return (
     <ChapterLayout
       id="blunder"
-      header={<ChapterTag chapter={c.chapter} move="MOVE 06" />}
+      header={<ChapterTag chapter={c.chapter} move="MOVE 05" />}
       footer={<MoveNav onPrev={onPrev} onNext={onNext} />}
     >
       <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
@@ -1499,7 +1474,7 @@ function Blunder({ onNext, onPrev }: { onNext: () => void; onPrev: () => void })
   );
 }
 
-/* ─────────────────────────── 07 WRAPPED ─────────────────────────── */
+/* ─────────────────────────── 06 WRAPPED ─────────────────────────── */
 
 type WrappedSlide =
   | { kind: "card"; card: (typeof content.wrapped.cards)[number] }
@@ -1531,7 +1506,7 @@ function Wrapped({ onNext, onPrev }: { onNext: () => void; onPrev: () => void })
       header={
         <Reveal className="flex items-center gap-3">
           <span className="h-px w-8 bg-accent" />
-          <span className="font-mono text-sm tracking-[0.3em] text-accent">MOVE 07</span>
+          <span className="font-mono text-sm tracking-[0.3em] text-accent">MOVE 06</span>
         </Reveal>
       }
       footer={
@@ -1639,7 +1614,7 @@ function Wrapped({ onNext, onPrev }: { onNext: () => void; onPrev: () => void })
   );
 }
 
-/* ─────────────────────────── 08 THE NEXT MOVE ─────────────────────────── */
+/* ─────────────────────────── 07 THE NEXT MOVE ─────────────────────────── */
 
 function Endgame({
   pieces,
@@ -1654,7 +1629,7 @@ function Endgame({
   return (
     <ChapterLayout
       id="endgame"
-      header={<ChapterTag chapter={c.chapter} move="MOVE 08" />}
+      header={<ChapterTag chapter={c.chapter} move="MOVE 07" />}
       footer={
         <Reveal delay={100} className="flex items-center justify-between gap-3">
           <PrevMoveButton onClick={onPrev} />

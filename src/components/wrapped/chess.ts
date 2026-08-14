@@ -44,16 +44,21 @@ export function startingPieces(): Piece[] {
   return out;
 }
 
-/** One coherent game: Italian-ish opening, a blunder, then a bare endgame. */
+/**
+ * One coherent game: Italian-ish opening, a blunder, then a bare endgame.
+ * Seven half-moves — one per content chapter. (The castle that used to sit
+ * between the bishop move and the blunder was cut when the Competition
+ * chapter was removed; nothing downstream depended on it, so the rest of
+ * the game is untouched and still fully legal.)
+ */
 export const MOVES: Move[] = [
   { from: "e2", to: "e4", notation: "1. e4", hint: "Open the game. Push the glowing pawn forward." },
   { from: "e7", to: "e5", notation: "1… e5", hint: "The other side answers. Move the glowing pawn." },
   { from: "g1", to: "f3", notation: "2. Nf3", hint: "Develop the knight towards the centre." },
   { from: "b8", to: "c6", notation: "2… Nc6", hint: "Bring the black knight out." },
   { from: "f1", to: "c4", notation: "3. Bc4", hint: "Aim the bishop at the weakest square." },
-  { from: "e1", to: "g1", notation: "4. 0-0", hint: "Castle. Tuck the king away.", also: { from: "h1", to: "f1" } },
-  { from: "c6", to: "d4", notation: "4… Nd4?", hint: "Move the knight. This one is a mistake." },
-  { from: "f3", to: "d4", notation: "5. Nxd4", hint: "Take the knight. Endgames are made of these." },
+  { from: "c6", to: "d4", notation: "3… Nd4?", hint: "Move the knight. This one is a mistake." },
+  { from: "f3", to: "d4", notation: "4. Nxd4", hint: "Take the knight. Endgames are made of these." },
 ];
 
 /** Apply the first `count` moves to the starting position. */
