@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useState, type CSSProperties } from "react";
-import { content } from "@/content/cv";
+import { content, type WrappedCard as WrappedCardData } from "@/content/cv";
 import { Chessboard } from "./Chessboard";
 import { MOVES, applyMove, positionAfter, type Piece } from "./chess";
 import { ChapterLayout } from "./ChapterLayout";
-import { Counter } from "./Counter";
 import { PhotoSlot } from "./PhotoSlot";
 import { ChapterTag, Reveal } from "./Reveal";
+import { ScrollReveal } from "./ScrollReveal";
 import { Loader, ProgressRail, SoundToggle } from "./Chrome";
 import { playTick, setSoundEnabled } from "./sound";
 
@@ -34,7 +34,7 @@ const CHAPTER_LABELS = [
   "02 PASSIONS",
   "03 BEAUTY",
   "04 MATCH",
-  "05 BLUNDER",
+  "05 ANALYSIS",
   "06 WRAPPED",
   "07 ENDGAME",
 ];
@@ -1325,290 +1325,720 @@ function Beauty({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) 
 
 /* ─────────────────────────── 04 L'ORÉAL MATCH ─────────────────────────── */
 
-function Loreal({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) {
-  const c = content.loreal;
-  const [active, setActive] = useState(0);
-  const reason = c.reasons[active]!;
+/** A single trait card — same clickable-card language as PassionCard, but
+ *  reuses the Analysis icon set / tone system and opens the shared
+ *  AnalysisModal below rather than a page-specific one. */
+function TraitMatchCard({
+  item,
+  index,
+  onOpen,
+}: {
+  item: AnalysisItem;
+  index: number;
+  onOpen: () => void;
+}) {
   return (
-    <ChapterLayout
-      id="loreal"
-      header={
-        <Reveal>
-          <span className="font-mono text-sm tracking-[0.3em] text-accent">
-            BRAND MATCH · MOVE 04
-          </span>
-        </Reveal>
-      }
-      footer={<MoveNav onPrev={onPrev} onNext={onNext} />}
+    <button
+      type="button"
+      onClick={onOpen}
+      aria-label={`${item.title} — trait analysis`}
+      className="group flex h-full w-full flex-col items-center overflow-hidden rounded-2xl border border-accent/25 bg-card/40 p-3 text-center transition-all duration-300 hover:-translate-y-1 hover:border-accent/60 hover:shadow-[0_0_36px_-16px_var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:p-4"
     >
-      <Reveal>
-        <h2 className="max-w-3xl font-display text-[clamp(1.75rem,5vw,3rem)] uppercase leading-[0.9]">
-          {c.title}
-        </h2>
-      </Reveal>
-      <Reveal delay={140}>
-        <div className="mt-3 overflow-hidden rounded-2xl border border-accent/40 bg-card p-4 text-center sm:p-5">
-          <div className="font-mono text-sm tracking-[0.25em] text-muted-foreground">
-            THE MATCH IS
-          </div>
-          <p className="mt-1 font-display text-[clamp(1.75rem,6vw,3.5rem)] uppercase leading-[0.9] text-accent">
-            {c.brand}
-          </p>
-          <p className="mx-auto mt-2 max-w-lg text-sm text-muted-foreground sm:text-base">
-            {c.brandLine}
-          </p>
-        </div>
-      </Reveal>
-
-      <Reveal delay={180} className="mt-3 flex flex-wrap justify-center gap-2">
-        {c.reasons.map((r, i) => (
-          <button
-            key={r.label}
-            type="button"
-            onClick={() => setActive(i)}
-            aria-pressed={i === active}
-            className={`rounded-full border px-4 py-1.5 font-mono text-sm tracking-[0.2em] transition-colors ${
-              i === active
-                ? "border-accent bg-accent text-accent-foreground"
-                : "border-border text-muted-foreground hover:border-accent hover:text-foreground"
-            }`}
-          >
-            {r.label}
-          </button>
-        ))}
-      </Reveal>
-
-      <Reveal
-        key={active}
-        className="mx-auto mt-3 max-w-xl rounded-2xl border border-border bg-card p-3 text-center sm:p-4"
+      <span className="font-mono text-[0.6rem] tracking-[0.25em] text-muted-foreground/70">
+        {String(index + 1).padStart(2, "0")}
+      </span>
+      <span className="mt-1.5 grid h-9 w-9 shrink-0 place-items-center rounded-full border border-accent/40 p-2 text-accent transition-transform duration-300 group-hover:scale-110 sm:h-10 sm:w-10">
+        <AnalysisIcon kind={item.icon} />
+      </span>
+      <h3 className="mt-2 font-display text-sm uppercase leading-tight tracking-tight text-foreground sm:text-base lg:text-lg">
+        {item.title}
+      </h3>
+      <p className="mt-1 line-clamp-3 text-[0.72rem] leading-snug text-muted-foreground transition-colors group-hover:text-foreground/80 sm:line-clamp-none sm:text-[0.8rem]">
+        {item.text}
+      </p>
+      <span
+        className="mt-auto pt-1.5 font-mono text-[0.65rem] uppercase tracking-[0.2em] text-accent opacity-60 transition-opacity group-hover:opacity-100"
+        aria-hidden
       >
-        <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">{reason.text}</p>
-      </Reveal>
-
-      <Reveal delay={120}>
-        <div className="mx-auto mt-3 max-w-xl rounded-2xl border border-dashed border-border p-3 text-center sm:p-4">
-          <div className="font-display text-lg uppercase sm:text-xl">
-            BUT WE&apos;RE NOT IDENTICAL.
-          </div>
-          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{c.notIdentical}</p>
-        </div>
-      </Reveal>
-    </ChapterLayout>
+        View →
+      </span>
+    </button>
   );
 }
 
-/* ─────────────────────────── 05 THE BLUNDER ─────────────────────────── */
+function Loreal({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) {
+  const c = content.loreal;
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const openItem = openIndex !== null ? c.traits[openIndex]! : null;
+
+  return (
+    <>
+      <ChapterLayout
+        id="loreal"
+        header={
+          // Same lg:pl-24 clearance pattern as Blunder's header — keeps the
+          // "04 / 07" tag clear of the fixed SoundToggle pinned top-left.
+          <div className="flex min-h-11 items-center justify-between gap-4 lg:min-h-0 lg:pl-24">
+            <Reveal className="hidden lg:block">
+              <p className="font-mono text-sm tracking-[0.3em] text-accent">04 / 07</p>
+            </Reveal>
+            <Reveal className="ml-auto">
+              <p className="flex items-center gap-2 font-mono text-sm tracking-[0.3em] text-muted-foreground">
+                BRAND MATCH
+                <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-accent" aria-hidden />
+              </p>
+            </Reveal>
+          </div>
+        }
+        footer={
+          <Reveal delay={220} className="flex items-center justify-between gap-3">
+            <PrevMoveButton onClick={onPrev} />
+            <p className="hidden flex-1 items-center justify-center gap-3 text-center font-mono text-[0.65rem] uppercase tracking-[0.25em] text-muted-foreground sm:flex">
+              <span className="text-accent" aria-hidden>
+                ♗
+              </span>
+              {c.moveCaption}
+              <span className="text-accent" aria-hidden>
+                ♗
+              </span>
+            </p>
+            <NextMoveButton onClick={onNext} />
+          </Reveal>
+        }
+      >
+        {/* lg:pr-* keeps content clear of the fixed chapter rail, matching Blunder. */}
+        <div className="mx-auto flex h-full min-h-0 w-full max-w-6xl flex-col gap-2 sm:gap-3 lg:pr-32">
+          <div className="shrink-0 text-center">
+            <Reveal>
+              <p className="font-mono text-[0.65rem] tracking-[0.3em] text-muted-foreground sm:text-xs">
+                IF PRANAV WERE A L&apos;ORÉAL BRAND, I&apos;D BE
+              </p>
+            </Reveal>
+            <Reveal delay={60}>
+              <p className="mt-1 font-mono text-[0.65rem] tracking-[0.3em] text-accent sm:text-xs">
+                YOUR BRAND MATCH
+              </p>
+            </Reveal>
+            <Reveal delay={100}>
+              <h2 className="font-display text-[clamp(2.25rem,8vw,4.5rem)] uppercase leading-[0.85] text-accent">
+                {c.brand}
+              </h2>
+            </Reveal>
+            <Reveal delay={140}>
+              <p className="mx-auto mt-1 max-w-2xl font-display text-base uppercase leading-tight tracking-tight text-foreground sm:text-xl">
+                {c.brandLine}
+              </p>
+            </Reveal>
+            <Reveal delay={170}>
+              <span className="mt-2 inline-block rounded-full border border-accent/40 px-3 py-1 font-mono text-[0.6rem] uppercase tracking-[0.2em] text-accent">
+                {c.stat.label} · {c.stat.value}
+              </span>
+            </Reveal>
+          </div>
+
+          <div className="grid min-h-0 flex-1 grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-3">
+            {c.traits.map((item, i) => (
+              <Reveal key={item.title} delay={200 + i * 60} className="min-h-0">
+                <TraitMatchCard item={item} index={i} onOpen={() => setOpenIndex(i)} />
+              </Reveal>
+            ))}
+          </div>
+
+          <Reveal delay={380} className="shrink-0">
+            <div className="mx-auto max-w-2xl rounded-2xl border border-border bg-card/30 px-4 py-2.5 text-center sm:px-6 sm:py-3">
+              <p className="font-display text-sm italic leading-snug text-foreground sm:text-base lg:text-lg">
+                &ldquo;{c.quote}&rdquo;
+              </p>
+              <p className="mt-1 font-mono text-[0.6rem] tracking-[0.3em] text-accent">— PRANAV</p>
+            </div>
+          </Reveal>
+        </div>
+      </ChapterLayout>
+
+      {openItem ? (
+        <AnalysisModal
+          item={openItem}
+          tone="accent"
+          eyebrow="TRAIT ANALYSIS"
+          onClose={() => setOpenIndex(null)}
+        />
+      ) : null}
+    </>
+  );
+}
+
+/* ─────────────────────────── 05 BRILLIANCIES & BLUNDERS ─────────────────────────── */
+
+type AnalysisIconKind =
+  | "search"
+  | "target"
+  | "bolt"
+  | "thought"
+  | "eye"
+  | "king"
+  | "flask"
+  | "shield"
+  | "puzzle";
+type AnalysisTone = "accent" | "destructive";
+type AnalysisItem = { title: string; text: string; note?: string; badge?: string; icon: AnalysisIconKind };
+
+/** Small line-art icon set — same visual language as PassionIcon/FamilyIcon.
+ *  "king" reuses the actual chess glyph rather than drawing a crown from
+ *  scratch, tying the joke ("one more game") directly to the real piece. */
+function AnalysisIcon({ kind }: { kind: AnalysisIconKind }) {
+  if (kind === "king") {
+    return (
+      <span className="grid h-full w-full place-items-center text-[1.3em] leading-none" aria-hidden>
+        ♚
+      </span>
+    );
+  }
+  const common = {
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.6,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+    className: "h-full w-full",
+  };
+  switch (kind) {
+    case "search":
+      return (
+        <svg {...common} aria-hidden>
+          <circle cx="10.5" cy="10.5" r="6.5" />
+          <path d="m20 20-4.8-4.8" />
+        </svg>
+      );
+    case "target":
+      return (
+        <svg {...common} aria-hidden>
+          <circle cx="12" cy="12" r="8" />
+          <circle cx="12" cy="12" r="3.2" />
+          <path d="M12 2v3.2M12 18.8V22M2 12h3.2M18.8 12H22" />
+        </svg>
+      );
+    case "bolt":
+      return (
+        <svg {...common} aria-hidden>
+          <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" />
+        </svg>
+      );
+    case "thought":
+      return (
+        <svg {...common} aria-hidden>
+          <path d="M7 14.5a4.5 4.5 0 1 1 4.7-6.9A4 4 0 0 1 17 11a4 4 0 0 1-.4 8H8a4 4 0 0 1-1-8.5Z" />
+          <circle cx="14.5" cy="19.5" r="1" fill="currentColor" stroke="none" />
+          <circle cx="17.5" cy="21.6" r="0.6" fill="currentColor" stroke="none" />
+        </svg>
+      );
+    case "eye":
+      return (
+        <svg {...common} aria-hidden>
+          <path d="M2 12s3.8-6.5 10-6.5S22 12 22 12s-3.8 6.5-10 6.5S2 12 2 12Z" />
+          <circle cx="12" cy="12" r="2.6" />
+        </svg>
+      );
+    case "flask":
+      return (
+        <svg {...common} aria-hidden>
+          <path d="M9.5 3h5M10 3v6.5L4.8 18a2 2 0 0 0 1.7 3h11a2 2 0 0 0 1.7-3L14 9.5V3" />
+          <path d="M7.2 15h9.6" />
+        </svg>
+      );
+    case "shield":
+      return (
+        <svg {...common} aria-hidden>
+          <path d="M12 3.5 19 6v6c0 4.5-3 7.7-7 8.5-4-.8-7-4-7-8.5V6l7-2.5Z" />
+          <path d="m9 12 2 2 4-4.2" />
+        </svg>
+      );
+    case "puzzle":
+      return (
+        <svg {...common} aria-hidden>
+          <path d="M9 4h4a1.6 1.6 0 0 1 1.6 2.7 1.6 1.6 0 0 0 1.7 2.6H20v4a1.6 1.6 0 0 1-2.7 1.6 1.6 1.6 0 0 0-2.6 1.7V20H10a1.6 1.6 0 0 1-1.6-2.7A1.6 1.6 0 0 0 6.7 15.6H4v-4a1.6 1.6 0 0 1 2.7-1.6A1.6 1.6 0 0 0 8.3 8.3 1.6 1.6 0 0 1 9 4Z" />
+        </svg>
+      );
+  }
+}
+
+function AnalysisRow({
+  index,
+  item,
+  tone,
+  onOpen,
+  ariaSuffix = "analyse this move",
+}: {
+  index: number;
+  item: AnalysisItem;
+  tone: AnalysisTone;
+  onOpen: () => void;
+  /** Trailing half of the row's aria-label — override when "move" doesn't fit the page's framing. */
+  ariaSuffix?: string;
+}) {
+  const toneText = tone === "accent" ? "text-accent" : "text-destructive";
+  const toneBorder = tone === "accent" ? "border-accent/40" : "border-destructive/40";
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      aria-label={`${item.title} — ${ariaSuffix}`}
+      className="group flex w-full items-start gap-2.5 py-2.5 text-left transition-colors first:pt-0 last:pb-0 sm:gap-3 sm:py-3"
+    >
+      <span className={`shrink-0 font-display text-xl leading-none opacity-60 transition-opacity group-hover:opacity-100 sm:text-2xl ${toneText}`}>
+        {String(index + 1).padStart(2, "0")}
+      </span>
+      <span
+        className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border p-1.5 transition-transform duration-300 group-hover:scale-110 sm:h-9 sm:w-9 sm:p-2 ${toneBorder} ${toneText}`}
+      >
+        <AnalysisIcon kind={item.icon} />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block font-display text-sm uppercase leading-tight tracking-tight text-foreground transition-colors sm:text-base lg:text-lg">
+          {item.title}
+        </span>
+        <span className="mt-0.5 block text-[0.72rem] leading-snug text-muted-foreground transition-colors group-hover:text-foreground/80 sm:text-[0.8rem]">
+          {item.text}
+        </span>
+      </span>
+      <span
+        className={`mt-1 shrink-0 font-mono text-sm opacity-40 transition-all group-hover:translate-x-1 group-hover:opacity-100 sm:text-base ${toneText}`}
+        aria-hidden
+      >
+        →
+      </span>
+    </button>
+  );
+}
+
+function AnalysisPanel({
+  title,
+  glyph,
+  tone,
+  items,
+  onOpen,
+  ariaSuffix = "analyse this move",
+}: {
+  title: string;
+  glyph: string;
+  tone: AnalysisTone;
+  items: AnalysisItem[];
+  onOpen: (i: number) => void;
+  ariaSuffix?: string;
+}) {
+  const toneText = tone === "accent" ? "text-accent" : "text-destructive";
+  const toneBorder = tone === "accent" ? "border-accent/40" : "border-destructive/35";
+  const toneGlow =
+    tone === "accent"
+      ? "shadow-[0_0_36px_-16px_var(--accent)]"
+      : "shadow-[0_0_36px_-16px_var(--destructive)]";
+  return (
+    <div
+      className={`flex h-full min-h-0 flex-col rounded-2xl border bg-card/40 p-3 transition-shadow duration-300 hover:shadow-[0_0_44px_-14px_currentColor] sm:p-4 ${toneBorder} ${toneGlow} ${toneText}`}
+    >
+      <div className="flex shrink-0 items-center gap-2">
+        <span className="text-lg sm:text-xl" aria-hidden>
+          {glyph}
+        </span>
+        <h3 className={`font-display text-lg uppercase tracking-tight sm:text-xl ${toneText}`}>{title}</h3>
+      </div>
+      <div className="mt-1 min-h-0 flex-1 divide-y divide-border/50 overflow-hidden text-foreground sm:mt-2">
+        {items.map((item, i) => (
+          <AnalysisRow
+            key={item.title}
+            index={i}
+            item={item}
+            tone={tone}
+            onOpen={() => onOpen(i)}
+            ariaSuffix={ariaSuffix}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AnalysisModal({
+  item,
+  tone,
+  onClose,
+  eyebrow,
+}: {
+  item: AnalysisItem;
+  tone: AnalysisTone;
+  onClose: () => void;
+  /** Overrides the default MOVE/POSITION ANALYSIS eyebrow for pages that
+   *  aren't framing the item as a chess move (e.g. a personality trait). */
+  eyebrow?: string;
+}) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const toneText = tone === "accent" ? "text-accent" : "text-destructive";
+  const toneBorder = tone === "accent" ? "border-accent/40" : "border-destructive/40";
+
+  return (
+    <div
+      className="fixed inset-0 z-50 grid animate-fade-in place-items-center bg-background/85 px-6 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label={item.title}
+        className={`animate-scale-in relative w-full max-w-md rounded-2xl border bg-card p-8 text-center ${toneBorder}`}
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close"
+          className="absolute right-4 top-4 font-mono text-lg text-muted-foreground transition-colors hover:text-foreground"
+        >
+          ✕
+        </button>
+        <p className={`font-mono text-[0.65rem] uppercase tracking-[0.3em] ${toneText}`}>
+          {eyebrow ?? (tone === "accent" ? "MOVE ANALYSIS" : "POSITION ANALYSIS")}
+        </p>
+        <span
+          className={`mx-auto mt-3 grid h-14 w-14 place-items-center rounded-full border p-3 ${toneBorder} ${toneText}`}
+        >
+          <AnalysisIcon kind={item.icon} />
+        </span>
+        <h3 className={`mt-4 font-display text-2xl uppercase sm:text-3xl ${toneText}`}>{item.title}</h3>
+        <p className="mt-4 text-base leading-relaxed text-foreground/90">{item.text}</p>
+        {item.note ? (
+          <p className="mt-3 text-sm italic leading-relaxed text-muted-foreground">{item.note}</p>
+        ) : null}
+        {item.badge ? (
+          <span
+            className={`mt-4 inline-block rounded-full border px-3 py-1 font-mono text-[0.6rem] uppercase tracking-[0.2em] ${toneBorder} ${toneText}`}
+          >
+            {item.badge}
+          </span>
+        ) : null}
+      </div>
+    </div>
+  );
+}
 
 function Blunder({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) {
   const c = content.blunder;
-  const [active, setActive] = useState(0);
-  const row = c.rows[active]!;
+  const [openItem, setOpenItem] = useState<{ tone: AnalysisTone; index: number } | null>(null);
+  const openData = openItem
+    ? openItem.tone === "accent"
+      ? c.brilliancies[openItem.index]
+      : c.blunders[openItem.index]
+    : null;
+
   return (
-    <ChapterLayout
-      id="blunder"
-      header={<ChapterTag chapter={c.chapter} move="MOVE 05" />}
-      footer={<MoveNav onPrev={onPrev} onNext={onNext} />}
-    >
-      <div className="grid gap-4 lg:grid-cols-[1fr_auto] lg:items-start">
-        <div>
-          <Reveal>
-            <h2 className="max-w-3xl font-display text-[clamp(1.75rem,5.5vw,3.25rem)] uppercase leading-[0.9]">
-              {c.title}
-            </h2>
-          </Reveal>
-          <Reveal delay={100}>
-            <div className="mt-3 font-mono text-sm tracking-[0.25em] text-destructive">
-              {c.headline}
-            </div>
-            <p className="mt-1 font-display text-xl uppercase leading-tight sm:text-2xl">
-              {c.name}
-            </p>
-          </Reveal>
-
-          <Reveal delay={160} className="mt-3 flex flex-wrap gap-2">
-            {c.rows.map((r, i) => (
-              <button
-                key={r.label}
-                type="button"
-                onClick={() => setActive(i)}
-                aria-pressed={i === active}
-                className={`rounded-full border px-3 py-1.5 font-mono text-sm tracking-[0.15em] transition-colors ${
-                  i === active
-                    ? "border-accent bg-accent text-accent-foreground"
-                    : "border-border text-muted-foreground hover:border-accent hover:text-foreground"
-                }`}
-              >
-                {r.label}
-              </button>
-            ))}
-          </Reveal>
-
-          <Reveal key={active} className="mt-2 max-w-xl rounded-xl border border-border bg-card p-3">
-            <p className="text-sm leading-relaxed text-muted-foreground">{row.text}</p>
-          </Reveal>
-        </div>
-
-        <Reveal delay={160} className="hidden sm:block">
-          <div className="mx-auto grid w-24 place-items-center">
-            <span className="shake-piece text-5xl text-destructive">♞</span>
-            <p className="mt-2 text-center font-mono text-sm tracking-[0.2em] text-muted-foreground">
-              PIECE HANGING
-            </p>
+    <>
+      <ChapterLayout
+        id="blunder"
+        header={
+          // "05 / 07" only shows from lg, where lg:pl-24 clears the fixed
+          // SoundToggle pinned top-left — same treatment as Passions/Player.
+          // Below lg the ProgressRail's mobile chip already names the chapter.
+          <div className="flex min-h-11 items-center justify-between gap-4 lg:min-h-0 lg:pl-24">
+            <Reveal className="hidden lg:block">
+              <p className="font-mono text-sm tracking-[0.3em] text-accent">05 / 07</p>
+            </Reveal>
+            <Reveal className="ml-auto">
+              <p className="flex items-center gap-2 font-mono text-sm tracking-[0.3em] text-muted-foreground">
+                ANALYSIS MODE
+                <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-accent" aria-hidden />
+              </p>
+            </Reveal>
           </div>
-        </Reveal>
-      </div>
-
-      <Reveal delay={100}>
-        <div className="mt-3 rounded-xl border border-border bg-secondary p-3">
-          <div className="font-mono text-sm tracking-[0.2em] text-muted-foreground">
-            SECONDARY BLUNDER
+        }
+        footer={
+          <Reveal delay={220} className="flex items-center justify-between gap-3">
+            <PrevMoveButton onClick={onPrev} />
+            <p className="hidden flex-1 items-center justify-center gap-3 text-center font-mono text-[0.65rem] uppercase tracking-[0.25em] text-muted-foreground sm:flex">
+              <span className="text-accent" aria-hidden>
+                ⊙
+              </span>
+              Click a move to <span className="text-accent">analyse</span> it
+              <span className="text-accent" aria-hidden>
+                ⊙
+              </span>
+            </p>
+            <NextMoveButton onClick={onNext} />
+          </Reveal>
+        }
+      >
+        {/* lg:pr-* keeps the panels clear of the fixed chapter rail on the right. */}
+        <div className="mx-auto flex h-full min-h-0 w-full max-w-6xl flex-col gap-2 sm:gap-3 lg:pr-32">
+          <div className="shrink-0 text-center">
+            <Reveal>
+              <h2 className="font-display text-[clamp(1.5rem,5vw,3.25rem)] uppercase leading-[0.92]">
+                <span className="text-accent">BRILLIANCIES</span> &amp;{" "}
+                <span className="text-accent">BLUNDERS</span>
+              </h2>
+            </Reveal>
+            <Reveal delay={80}>
+              <p className="mx-auto mt-1 text-sm text-foreground/80 sm:text-base">
+                THE MOVES I GET RIGHT.
+              </p>
+            </Reveal>
+            <Reveal delay={120}>
+              <p className="mx-auto text-sm text-foreground/80 sm:text-base">
+                THE ONES I&apos;M STILL <span className="text-accent">LEARNING.</span>
+              </p>
+            </Reveal>
           </div>
-          <h3 className="mt-1 font-display text-lg uppercase sm:text-xl">{c.second.name}</h3>
-          <p className="mt-1 max-w-2xl text-sm leading-relaxed">{c.second.text}</p>
-          <p className="mt-1 hidden max-w-2xl text-sm leading-relaxed text-muted-foreground sm:block">
-            {c.second.reflection}
-          </p>
+
+          <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+            <Reveal delay={160} className="min-h-0">
+              <AnalysisPanel
+                title="BRILLIANCIES"
+                glyph="♞"
+                tone="accent"
+                items={c.brilliancies}
+                onOpen={(i) => setOpenItem({ tone: "accent", index: i })}
+              />
+            </Reveal>
+            <Reveal delay={220} className="min-h-0">
+              <AnalysisPanel
+                title="BLUNDERS"
+                glyph="♟"
+                tone="destructive"
+                items={c.blunders}
+                onOpen={(i) => setOpenItem({ tone: "destructive", index: i })}
+              />
+            </Reveal>
+          </div>
         </div>
-      </Reveal>
-    </ChapterLayout>
+      </ChapterLayout>
+
+      {openData ? (
+        <AnalysisModal item={openData} tone={openItem!.tone} onClose={() => setOpenItem(null)} />
+      ) : null}
+    </>
   );
 }
 
 /* ─────────────────────────── 06 WRAPPED ─────────────────────────── */
 
-type WrappedSlide =
-  | { kind: "card"; card: (typeof content.wrapped.cards)[number] }
-  | { kind: "numbers" }
-  | { kind: "mood" };
+/** Static bar heights read as "a waveform" without pulling in a real
+ *  audio-visualizer dependency for one glance-and-move-on card. */
+function Waveform() {
+  const heights = [40, 70, 100, 55, 85, 45, 65, 30];
+  return (
+    <div className="flex h-6 items-end gap-[3px]" aria-hidden>
+      {heights.map((h, i) => (
+        <span
+          key={i}
+          className="w-[3px] rounded-full bg-accent/70 transition-colors duration-300 group-hover:bg-accent"
+          style={{ height: `${h}%` }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function WrappedCard({ index, card }: { index: number; card: WrappedCardData }) {
+  const isMistake = card.kind === "mistake";
+  const toneText = isMistake ? "text-destructive" : "text-accent";
+  const toneBorder = isMistake
+    ? "border-destructive/35 hover:border-destructive/70"
+    : "border-accent/25 hover:border-accent/60";
+  const toneGlow = isMistake
+    ? "hover:shadow-[0_0_36px_-18px_var(--destructive)]"
+    : "hover:shadow-[0_0_36px_-18px_var(--accent)]";
+
+  return (
+    <div
+      className={`group flex h-full flex-col overflow-hidden rounded-2xl border bg-card/40 p-4 transition-all duration-300 hover:-translate-y-1 sm:p-5 ${toneBorder} ${toneGlow}`}
+    >
+      <p className={`font-mono text-[0.62rem] tracking-[0.25em] ${toneText}`}>
+        {String(index + 1).padStart(2, "0")} / {card.label}
+      </p>
+
+      <div className="mt-3 flex-1">
+        {card.kind === "music" ? (
+          <>
+            <div className="flex items-center justify-between gap-3">
+              <Waveform />
+              <span
+                className="text-lg text-accent/70 transition-transform duration-300 group-hover:scale-110"
+                aria-hidden
+              >
+                ▶
+              </span>
+            </div>
+            <h3 className="mt-3 font-display text-2xl uppercase leading-[0.9] sm:text-3xl">
+              {card.song}
+            </h3>
+            <p className="mt-0.5 font-mono text-xs tracking-[0.2em] text-muted-foreground">
+              {card.artist}
+            </p>
+          </>
+        ) : card.kind === "match" ? (
+          <>
+            <div className="flex items-center justify-between gap-2 font-mono text-[0.62rem] tracking-[0.1em] text-muted-foreground">
+              <span>{card.teamA}</span>
+              <span className="text-accent">VS</span>
+              <span className="text-right">{card.teamB}</span>
+            </div>
+            <p className="mt-2 text-center font-display text-4xl leading-none text-accent sm:text-5xl">
+              {card.score}
+            </p>
+            <div className="mt-2 flex items-center justify-center gap-2 font-mono text-[0.58rem] uppercase tracking-[0.2em] text-muted-foreground">
+              <span aria-hidden>♞</span>
+              {card.round} · MATCH ANALYSIS
+            </div>
+          </>
+        ) : card.kind === "thought" ? (
+          <div className="flex items-start justify-between gap-3">
+            <h3 className="font-display text-2xl uppercase leading-[0.95] sm:text-3xl">
+              {card.text}
+            </h3>
+            <div
+              className="grid shrink-0 grid-cols-3 gap-x-1.5 gap-y-0.5 pt-1 font-mono text-[0.62rem] text-muted-foreground/70"
+              aria-hidden
+            >
+              <span>1</span>
+              <span>3</span>
+              <span>5</span>
+              <span>2</span>
+              <span>4</span>
+              <span>R</span>
+            </div>
+          </div>
+        ) : card.kind === "mistake" ? (
+          <div className="flex items-start justify-between gap-3">
+            <h3 className="font-display text-xl uppercase leading-[0.95] text-destructive sm:text-2xl">
+              {card.text}
+            </h3>
+            <span className="mt-0.5 shrink-0 text-lg text-destructive" aria-hidden>
+              ⚠
+            </span>
+          </div>
+        ) : card.kind === "twist" ? (
+          <div className="text-center">
+            <p className="font-mono text-xs tracking-[0.3em] text-muted-foreground">{card.from}</p>
+            <p className="my-1 text-accent" aria-hidden>
+              ↓
+            </p>
+            <h3 className="font-display text-2xl uppercase leading-[0.95] text-accent sm:text-3xl">
+              {card.to}
+            </h3>
+          </div>
+        ) : (
+          <PhotoSlot photo={card.photo} ratio="aspect-[16/10]" className="mb-2" />
+        )}
+      </div>
+
+      {card.kind === "experience" ? (
+        <h3 className="mt-1 font-display text-lg uppercase leading-tight sm:text-xl">
+          {card.title}
+        </h3>
+      ) : null}
+      <p className="mt-2 text-[0.78rem] leading-snug text-muted-foreground transition-colors group-hover:text-foreground/80">
+        {card.caption}
+      </p>
+    </div>
+  );
+}
+
+function FinalWrappedCard({ final }: { final: typeof content.wrapped.final }) {
+  return (
+    <div className="relative overflow-hidden rounded-2xl border border-accent/40 bg-card/60 p-6 text-center shadow-[0_0_50px_-22px_var(--accent)] sm:p-8">
+      <div className="grain pointer-events-none absolute inset-0 opacity-20" aria-hidden />
+      <p className="relative font-mono text-xs tracking-[0.3em] text-accent">{final.label}</p>
+      <span className="relative mt-3 inline-block text-3xl text-accent sm:text-4xl" aria-hidden>
+        ♚
+      </span>
+      <h3 className="relative mt-3 font-display text-2xl uppercase leading-[0.95] sm:text-4xl">
+        {final.lines[0]}
+      </h3>
+      <h3 className="relative mt-1 font-display text-2xl uppercase leading-[0.95] text-accent sm:text-4xl">
+        {final.lines[1]}
+      </h3>
+      <span className="relative mt-4 inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-4 py-1.5 font-mono text-xs uppercase tracking-[0.25em] text-accent">
+        {final.tag} <span aria-hidden>♥</span>
+      </span>
+    </div>
+  );
+}
 
 function Wrapped({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) {
   const c = content.wrapped;
-  const marquee = useMemo(
-    () => Array(2).fill(`${content.name} WRAPPED · ${content.year} · `).join("").repeat(4),
-    [],
-  );
-  const slides = useMemo<WrappedSlide[]>(
-    () => [
-      ...c.cards.map((card) => ({ kind: "card" as const, card })),
-      { kind: "numbers" as const },
-      { kind: "mood" as const },
-    ],
-    [c.cards],
-  );
-  const [i, setI] = useState(0);
-  const slide = slides[i]!;
-  const isLast = i === slides.length - 1;
 
   return (
     <ChapterLayout
       id="wrapped"
-      className="overflow-hidden"
+      scrollContent
       header={
-        <Reveal className="flex items-center gap-3">
-          <span className="h-px w-8 bg-accent" />
-          <span className="font-mono text-sm tracking-[0.3em] text-accent">MOVE 06</span>
-        </Reveal>
-      }
-      footer={
-        <div className="flex items-center gap-3">
-          {/* chapter-level back, kept visually distinct from the slide stepper */}
-          <PrevMoveButton onClick={onPrev} />
-
-          <div className="flex flex-1 items-center justify-center gap-6">
-          <button
-            type="button"
-            onClick={() => setI((n) => Math.max(0, n - 1))}
-            disabled={i === 0}
-            aria-label="Previous stat"
-            className="font-mono text-sm tracking-[0.25em] text-muted-foreground transition-colors hover:text-foreground disabled:opacity-30"
-          >
-            ← PREV
-          </button>
-          <div className="flex gap-2" aria-hidden>
-            {slides.map((_, dotIdx) => (
-              <span
-                key={dotIdx}
-                className={`h-1.5 w-1.5 rounded-full transition-colors ${
-                  dotIdx === i ? "bg-accent" : "bg-border"
-                }`}
-              />
-            ))}
-          </div>
-            <button
-              type="button"
-              onClick={() => setI((n) => Math.min(slides.length - 1, n + 1))}
-              disabled={isLast}
-              aria-label="Next stat"
-              className="font-mono text-sm tracking-[0.25em] text-muted-foreground transition-colors hover:text-foreground disabled:opacity-30"
-            >
-              NEXT →
-            </button>
-          </div>
-
-          {/* the chapter CTA only unlocks once every stat has been seen */}
-          {isLast ? (
-            <NextMoveButton onClick={onNext} />
-          ) : (
-            <span
-              aria-hidden
-              className="shrink-0 rounded-full border border-transparent px-5 py-2.5 font-display text-sm uppercase tracking-wide text-transparent sm:px-7 sm:py-3"
-            >
-              Next move →
-            </span>
-          )}
+        // Same lg:pl-24 clearance pattern used on Blunder/Loreal's headers.
+        <div className="flex min-h-11 items-center justify-between gap-4 lg:min-h-0 lg:pl-24">
+          <Reveal className="hidden lg:block">
+            <p className="font-mono text-sm tracking-[0.3em] text-accent">06 / 07</p>
+          </Reveal>
+          <Reveal className="ml-auto">
+            <p className="flex items-center gap-2 font-mono text-sm tracking-[0.3em] text-muted-foreground">
+              FINAL WRAPPED
+              <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-accent" aria-hidden />
+            </p>
+          </Reveal>
         </div>
       }
-    >
-      <div className="pointer-events-none absolute inset-x-0 top-6 select-none opacity-[0.06]" aria-hidden>
-        <div className="marquee whitespace-nowrap font-display text-6xl uppercase">{marquee}</div>
-      </div>
-
-      <div className="relative">
-        <Reveal>
-          <h2 className="font-display text-[clamp(1.75rem,5.5vw,3.25rem)] uppercase leading-[0.88] text-accent">
-            {c.title}
-          </h2>
-        </Reveal>
-        <Reveal delay={100}>
-          <p className="mt-1 font-mono text-sm tracking-[0.2em] text-muted-foreground">
-            {c.subtitle}
+      footer={
+        <Reveal delay={120} className="flex items-center justify-between gap-3">
+          <PrevMoveButton onClick={onPrev} />
+          <p className="hidden flex-1 text-center font-mono text-[0.65rem] uppercase tracking-[0.25em] text-muted-foreground sm:block">
+            ↓ scroll for the full recap
           </p>
+          <NextMoveButton onClick={onNext} />
         </Reveal>
+      }
+    >
+      {/* This is the one chapter that scrolls — everything below lives inside
+          ChapterLayout's scrollContent pane, not the fixed centered column
+          every other chapter uses. lg:pr-32 still clears the right rail. */}
+      <div className="mx-auto w-full max-w-6xl pb-2 lg:pr-32">
+        <div className="pt-2 text-center sm:pt-4">
+          <Reveal>
+            <p className="font-mono text-xs tracking-[0.3em] text-muted-foreground">{c.eyebrow}</p>
+          </Reveal>
+          <Reveal delay={60}>
+            <h2 className="mt-1 font-display text-[clamp(2.5rem,9vw,5rem)] uppercase leading-[0.85]">
+              <span className="text-accent">{content.name}</span> WRAPPED
+            </h2>
+          </Reveal>
+          <Reveal delay={110}>
+            <p className="mx-auto mt-2 max-w-xl font-mono text-xs tracking-[0.2em] text-muted-foreground sm:text-sm">
+              {c.subtitle}
+            </p>
+          </Reveal>
+        </div>
 
-        <Reveal key={i} className="mt-4 grid place-items-center">
-          {slide.kind === "card" ? (
-            <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-5 text-center sm:p-6">
-              <div className="font-mono text-sm tracking-[0.2em] text-accent">
-                {slide.card.label}
-              </div>
-              <p className="mt-3 font-display text-2xl uppercase leading-[0.95] sm:text-3xl">
-                {slide.card.value}
-              </p>
-            </div>
-          ) : slide.kind === "numbers" ? (
-            <div className="grid w-full max-w-xl gap-4 sm:grid-cols-3">
-              {c.numbers.map((n) => (
-                <div key={n.label} className="text-center">
-                  <div className="font-display text-3xl leading-none text-accent sm:text-4xl">
-                    <Counter to={n.value} suffix={n.suffix} />
-                  </div>
-                  <div className="mt-2 font-mono text-sm tracking-[0.2em] text-muted-foreground">
-                    {n.label}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center">
-              <div className="font-mono text-sm tracking-[0.25em] text-muted-foreground">
-                CURRENT MOOD
-              </div>
-              <p className="mt-2 font-display text-[clamp(1.75rem,5.5vw,3.25rem)] uppercase leading-[0.9]">
-                &ldquo;{c.mood}&rdquo;
-              </p>
-            </div>
-          )}
-        </Reveal>
+        <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
+          {c.cards.map((card, i) => (
+            <ScrollReveal key={card.label} delay={(i % 3) * 60}>
+              <WrappedCard index={i} card={card} />
+            </ScrollReveal>
+          ))}
+        </div>
+
+        <ScrollReveal className="mt-4">
+          <FinalWrappedCard final={c.final} />
+        </ScrollReveal>
+
+        <ScrollReveal delay={80} className="mt-6 pb-6 text-center">
+          <p className="font-display text-xl uppercase tracking-tight sm:text-2xl">
+            {c.outro.thanks}
+          </p>
+          <p className="mt-1 font-mono text-xs tracking-[0.25em] text-accent sm:text-sm">
+            {c.outro.line}
+          </p>
+        </ScrollReveal>
       </div>
     </ChapterLayout>
   );

@@ -13,6 +13,7 @@ export function ChapterLayout({
   children,
   className = "",
   contentClassName = "",
+  scrollContent = false,
 }: {
   id?: string;
   header?: ReactNode;
@@ -20,6 +21,10 @@ export function ChapterLayout({
   children: ReactNode;
   className?: string;
   contentClassName?: string;
+  /** Escape hatch for the one chapter (Wrapped) that is a scroll-driven
+   *  reveal rather than a fixed slide: swaps the content row's clipping
+   *  for internal vertical scrolling instead of centering + clipping it. */
+  scrollContent?: boolean;
 }) {
   return (
     <section
@@ -32,7 +37,11 @@ export function ChapterLayout({
     >
       <div className="min-h-0 min-w-0">{header}</div>
       <div
-        className={`flex min-h-0 min-w-0 flex-col justify-center overflow-hidden ${contentClassName}`}
+        className={
+          scrollContent
+            ? `scroll-thin min-h-0 min-w-0 overflow-y-auto overscroll-contain ${contentClassName}`
+            : `flex min-h-0 min-w-0 flex-col justify-center overflow-hidden ${contentClassName}`
+        }
       >
         {children}
       </div>

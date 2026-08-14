@@ -14,6 +14,23 @@ export type Photo = {
   caption?: string;
 };
 
+/** One Wrapped-style card. `kind` picks which small visual renders inside it. */
+export type WrappedCard =
+  | { kind: "music"; label: string; song: string; artist: string; caption: string }
+  | {
+      kind: "match";
+      label: string;
+      teamA: string;
+      teamB: string;
+      round: string;
+      score: string;
+      caption: string;
+    }
+  | { kind: "thought"; label: string; text: string; caption: string }
+  | { kind: "mistake"; label: string; text: string; caption: string }
+  | { kind: "twist"; label: string; from: string; to: string; caption: string }
+  | { kind: "experience"; label: string; title: string; caption: string; photo: Photo };
+
 export const content = {
   name: "PRANAV",
   age: "25",
@@ -290,55 +307,145 @@ export const content = {
     },
   },
 
+  /**
+   * The L'Oréal brand match, framed as a Spotify-Wrapped result rather than
+   * an ad for the brand. `traits` are exactly 3 — clickable rows that expand
+   * into the same centered analysis card used on the Brilliancies & Blunders
+   * page, reusing that component rather than a new modal system.
+   */
   loreal: {
-    title: "IF I WERE A L'ORÉAL BRAND…",
-    brand: "[BRAND NAME]",
-    brandLine: "[ONE LINE ON WHAT THAT BRAND FEELS LIKE TO YOU]",
-    reasons: [
-      { label: "WHY #1", text: "[PERSONAL CONNECTION]" },
-      { label: "WHY #2", text: "[PERSONAL CONNECTION]" },
-      { label: "WHY #3", text: "[PERSONAL CONNECTION]" },
-    ],
-    notIdentical:
-      "[HONEST DIFFERENCE BETWEEN YOU AND THE BRAND — where you'd disagree with it.]",
+    brand: "CERAVE",
+    brandLine: "QUIETLY RELIABLE — LESS TALK, MORE SUBSTANCE.",
+    traits: [
+      {
+        title: "SCIENCE OVER NOISE",
+        text: "I like understanding how things work. I tend to trust evidence, logic and first principles more than just having the loudest opinion.",
+        icon: "flask",
+      },
+      {
+        title: "RELIABILITY OVER RECOGNITION",
+        text: "I value consistency and integrity. I'd rather be someone people can rely on than someone who constantly has to prove that I am.",
+        icon: "shield",
+      },
+      {
+        title: "SIMPLE OUTSIDE. THOUGHTFUL INSIDE.",
+        text: "I like keeping things uncomplicated on the surface, while putting real thought into what sits underneath.",
+        icon: "puzzle",
+      },
+    ] as { title: string; text: string; icon: "flask" | "shield" | "puzzle" }[],
+    quote:
+      "I may not always be the loudest voice, but I aim to be the person you can rely on when it really matters.",
+    /** One small Wrapped-style stat — kept to a single data point on purpose. */
+    stat: { label: "NO-NONSENSE INDEX", value: "98%" },
+    moveCaption: "NO FLASHY MOVES. JUST THE RIGHT ONES.",
   },
 
+  /**
+   * Strengths and weaknesses, told through the chess metaphor rather than a
+   * competency slide. `brilliancies` = the good moves, `blunders` = the ones
+   * still being learned from. Both arrays are exactly 3 items, rendered as
+   * clickable rows that expand into a centered analysis card on click. The
+   * hero heading and subtitle are hardcoded in Story.tsx (same pattern as
+   * every other big per-word-accented headline in this file).
+   */
   blunder: {
-    chapter: "BLUNDER",
-    title: "NOBODY PLAYS A PERFECT GAME.",
-    headline: "MY MOST REPEATED BLUNDER",
-    name: "[REAL WEAKNESS — in plain words, no perfectionist clichés]",
-    rows: [
-      { label: "WHAT I DO", text: "[WEAKNESS]" },
-      { label: "WHY I THINK I DO IT", text: "[REFLECTION]" },
-      { label: "WHEN IT HURTS ME", text: "[REAL CONSEQUENCE]" },
-      { label: "WHAT I'M TRYING TO CHANGE", text: "[WHAT YOU'RE ACTUALLY DOING ABOUT IT]" },
-    ],
-    second: {
-      name: "I BARELY TAKE PHOTOGRAPHS OF MYSELF.",
-      text: "Apparently, I've spent years documenting things I found interesting and almost no time documenting myself.",
-      reflection:
-        "[WHAT YOU THINK THAT SAYS ABOUT YOU — keep it light, but mean it. This is also why this site has empty photo frames.]",
-    },
+    brilliancies: [
+      {
+        title: "FINDING THE THREAD",
+        text: "When things aren't clear, I look for the problem underneath the noise and find a direction forward.",
+        icon: "search",
+      },
+      {
+        title: "PLAYING THE ENDGAME",
+        text: "I like knowing where I'm trying to get before deciding which moves will take me there.",
+        icon: "target",
+      },
+      {
+        title: "KEEPING THE CLOCK RUNNING",
+        text: "Once I lock in the direction, I bring the energy and persistence to keep moving forward.",
+        icon: "bolt",
+      },
+    ] as { title: string; text: string; icon: "search" | "target" | "bolt" }[],
+    blunders: [
+      {
+        title: "THINK LESS. MOVE MORE.",
+        text: "I can spend too much time analysing a simple move when making it and adjusting later would be better.",
+        icon: "thought",
+      },
+      {
+        title: "ZOOM OUT",
+        text: "When something grabs my attention, I can go deep enough to forget to look around.",
+        note: "Working on my wide angle.",
+        icon: "eye",
+      },
+      {
+        title: "ONE. MORE. GAME.",
+        text: "I've been telling myself this for years.",
+        note: "Is it really a weakness if I'm still winning?",
+        badge: "SELF-AWARENESS: +1",
+        icon: "king",
+      },
+    ] as { title: string; text: string; note?: string; badge?: string; icon: "thought" | "eye" | "king" }[],
   },
 
   wrapped: {
-    title: "YOUR YEAR IN REVIEW",
-    subtitle: "No algorithm. Just an honest tally.",
+    title: "PRANAV WRAPPED",
+    subtitle: "A YEAR. A FEW MOVES. A LOT OF RANDOM THINGS.",
+    eyebrow: "YOUR YEAR IN REVIEW",
     cards: [
-      { label: "MOST PLAYED", value: "[PASSION]" },
-      { label: "MOST WATCHED", value: "[PASSION]" },
-      { label: "MOST REPEATED THOUGHT", value: "[TEXT]" },
-      { label: "MOST REPEATED MISTAKE", value: "[TEXT]" },
-      { label: "BIGGEST PLOT TWIST", value: "[TEXT]" },
-      { label: "MOST UNDERRATED EXPERIENCE", value: "[TEXT]" },
-    ],
-    numbers: [
-      { value: 1247, label: "GAMES PLAYED", suffix: "" },
-      { value: 96, label: "OPENINGS I STILL GET WRONG", suffix: "" },
-      { value: 3, label: "OPINIONS I CHANGED THIS YEAR", suffix: "" },
-    ],
-    mood: "STILL FIGURING IT OUT.",
+      {
+        kind: "music",
+        label: "MOST PLAYED",
+        song: "UP&UP",
+        artist: "COLDPLAY",
+        caption: "The song I kept coming back to. Apparently, I needed the reminder.",
+      },
+      {
+        kind: "match",
+        label: "MOST WATCHED",
+        teamA: "BAYERN MUNICH",
+        teamB: "REAL MADRID",
+        round: "2ND LEG",
+        score: "4 — 3",
+        caption: "Some matches are watched. Some are experienced.",
+      },
+      {
+        kind: "thought",
+        label: "MOST REPEATED THOUGHT",
+        text: "WHICH GEAR AM I ON?",
+        caption:
+          "New driver problems. Somehow this question needed answering approximately 47 times.",
+      },
+      {
+        kind: "mistake",
+        label: "MOST REPEATED MISTAKE",
+        text: "STARTING THE CAR WITH THE HANDBRAKE ON.",
+        caption: "Apparently the car wasn't the only thing learning.",
+      },
+      {
+        kind: "twist",
+        label: "BIGGEST PLOT TWIST",
+        from: "ME",
+        to: "IIM MUMBAI",
+        caption: "Not exactly how I pictured the route. Somehow, the route worked.",
+      },
+      {
+        kind: "experience",
+        label: "MOST UNDERRATED EXPERIENCE",
+        title: "A TREK TO RAJGAD FORT",
+        caption: "No deadlines. No notifications. Just a very long climb and a much better view.",
+        photo: { label: "PHOTO — RAJGAD FORT", src: "" } as Photo,
+      },
+    ] as WrappedCard[],
+    final: {
+      label: "CURRENT STATUS",
+      lines: ["SPENT YEARS TRYING TO MAKE THE RIGHT MOVES.", "STILL GET CHECKED BY LIFE."],
+      tag: "GAME ON.",
+    },
+    outro: {
+      thanks: "THANKS FOR PLAYING.",
+      line: "STILL MAKING MOVES.",
+    },
   },
 
   endgame: {
