@@ -18,63 +18,242 @@ export const content = {
   name: "PRANAV",
   age: "25",
   year: "2026",
-  subtitle: "PRANAV WRAPPED · 2026",
+  subtitle: "PRANAV WRAPPED · 25 YEARS, STILL LOADING...",
 
   intro: {
     chapter: "OPENING",
-    title: "MEET THE PLAYER",
-    subtitle: "Before the moves, there was the player.",
+    title: "HOW DID I GET HERE?",
+    subtitle: "A small-town start, a lot of moving around, and a few unexpected turns.",
     /** Write this the way you'd say it out loud, not the way you'd write it on LinkedIn. */
     voice:
       "[SHORT INTRO IN YOUR OWN VOICE — 3 or 4 sentences. Who you are on an ordinary Tuesday, not on a CV. What you're curious about. What you're bad at pretending to care about.]",
     portrait: { label: "PHOTO — PORTRAIT", src: "", caption: "[optional caption]" } as Photo,
+    /** Three small personal photos for the journey page. Add real files under /public and set `src`. */
+    photos: [
+      { label: "PHOTO — SMALL-TOWN ROOTS", src: "", caption: "SMALL-TOWN ROOTS" },
+      { label: "PHOTO — HOSTEL LIFE", src: "", caption: "HOSTEL LIFE" },
+      { label: "PHOTO — A NEW CHAPTER", src: "", caption: "A NEW CHAPTER" },
+    ] as Photo[],
+    /**
+     * The journey map. Order matters — it's drawn as a path in this order.
+     * `kind`: "start" | "normal" | "sub" | "blunder" | "current".
+     * "sub" entries are minor milestones that branch off their nearest
+     * "normal"/"start" neighbour instead of sitting on the main route.
+     */
+    journey: [
+      {
+        year: "2001",
+        location: "SALWADGAON",
+        label: "WHERE IT STARTED",
+        description: "Born in Salwadgaon, a small village in Maharashtra.",
+        kind: "start",
+      },
+      {
+        year: "2005",
+        age: "4",
+        location: "AHMEDNAGAR",
+        label: "HOSTEL LIFE BEGINS",
+        description:
+          "Moved to a hostel at the age of four. Apparently, independence started early.",
+        kind: "normal",
+      },
+      {
+        year: "2009",
+        age: "8",
+        location: "SHEVGAON",
+        label: "BACK HOME",
+        description:
+          "Returned to Shevgaon, my hometown. Completed the rest of my schooling here until Class 10.",
+        kind: "normal",
+      },
+      {
+        year: "2012",
+        location: "SCHOOL",
+        label: "HOUSE CAPTAIN",
+        description: "Became House Captain.",
+        kind: "sub",
+      },
+      {
+        year: "2014",
+        location: "SCHOOL",
+        label: "HEAD BOY",
+        description: "Became School Head Boy.",
+        kind: "sub",
+      },
+      {
+        year: "2015",
+        location: "PUNE",
+        label: "THE PLAN",
+        description: "Moved to Pune for JEE preparation.",
+        kind: "normal",
+      },
+      {
+        year: "2015",
+        location: "JEE",
+        label: "FIRST BLUNDER",
+        description: "Didn't clear JEE. Not quite the move I'd planned.",
+        kind: "blunder",
+      },
+      {
+        year: "2016",
+        location: "KARAD",
+        label: "ENGINEERING",
+        description:
+          "Joined a Government College in Karad. Electronics & Telecommunication Engineering.",
+        kind: "normal",
+      },
+      {
+        year: "2022",
+        location: "KARAD",
+        label: "ROBOTICS CLUB",
+        description: "President of the Robotics Club.",
+        kind: "sub",
+      },
+      {
+        year: "2023",
+        location: "KARAD",
+        label: "INDOOR GAMES",
+        description: "Head of the Indoor Games Committee.",
+        kind: "sub",
+      },
+      {
+        year: "2024",
+        location: "PUNE",
+        label: "FIRST JOB",
+        description: "Joined Lear Corporation for my first job.",
+        kind: "normal",
+      },
+      {
+        year: "2025",
+        location: "CAT",
+        label: "ANOTHER BLUNDER",
+        description: "Didn't clear CAT on my first attempt.",
+        kind: "blunder",
+      },
+      {
+        year: "2026",
+        location: "MUMBAI",
+        label: "CURRENT POSITION",
+        description: "Joined my dream college — IIM Mumbai.",
+        kind: "current",
+      },
+    ] as {
+      year: string;
+      age?: string;
+      location: string;
+      label: string;
+      description: string;
+      kind: "start" | "normal" | "sub" | "blunder" | "current";
+    }[],
+    /** What the journey made you, not a repeat of the journey itself. */
     traits: [
-      "[TRAIT 01]",
-      "[TRAIT 02]",
-      "[TRAIT 03]",
-      "[TRAIT 04]",
-      "[TRAIT 05]",
+      {
+        trait: "OPEN-MINDED",
+        text: "Moving through very different environments taught me that my way isn't necessarily the only way. I genuinely enjoy hearing how other people approach the same problem.",
+      },
+      {
+        trait: "SELF-RELIANT",
+        text: "Responsibility became a default setting for me rather than something I consciously learned. I am usually comfortable figuring things out before asking someone else to do it for me.",
+      },
+      {
+        trait: "CURIOUS",
+        text: "I tend to ask one more question than necessary. Sometimes that leads somewhere useful. Sometimes it leads to a 20-minute rabbit hole.",
+      },
+      {
+        trait: "ADAPTABLE",
+        text: "[WHY THIS TRAIT — one or two honest sentences about landing in new places/situations and adjusting fast.]",
+      },
     ],
     mostLikelyTo: "[PERSONAL QUIRK — the thing your friends would bet money on you doing]",
     operatingSystem:
       "[SHORT PERSONAL DESCRIPTION — how your head currently runs. One or two lines.]",
+    /** The Spotify-Wrapped-style label for who you are. */
+    personalityType: "THE CURIOUS COMPETITOR",
   },
 
   passions: {
     chapter: "DEVELOPMENT",
-    title: "WHAT I PLAY WHEN NOBODY IS WATCHING",
-    subtitle: "Top genres. No skips.",
-    cards: [
+    title: "WHAT I DO WHEN NOBODY IS ASKING",
+    subtitle: "Some things I play. Some things I read. Some things I just can't leave unfinished.",
+    /** Label above the compact footer summary. */
+    rotationLabel: "CURRENT ROTATION",
+    /**
+     * Six passions, equal weight. `visual` picks the card's motif — the valid
+     * keys are "chess" | "football" | "sudoku" | "reading" | "building" | "cards".
+     * `shortText` is the line on the card, `description` is the modal copy.
+     * `detail` is OPTIONAL and deliberately unset: only add one when it's a real
+     * fact (e.g. { label: "PLAYED SINCE", value: "2012" }) — never invent a stat.
+     */
+    items: [
       {
-        glyph: "♟",
+        id: "chess",
         title: "CHESS",
-        minutes: 0, // optional fake-stat counter; set a number you're happy showing
-        text: "[WHY YOU GENUINELY ENJOY IT — not 'it teaches strategy'. The actual feeling.]",
-        photo: { label: "PHOTO — CHESS", src: "" } as Photo,
+        shortLabel: "CHESS",
+        visual: "chess",
+        shortText: "I like games where the other person is actively trying to ruin my plan.",
+        description:
+          "I like games where the other person is actively trying to ruin my plan. Half the fun is that you can do everything right and still get outplayed — and the only thing to do about it is sit there and think harder.",
       },
       {
-        glyph: "⚽",
+        id: "football",
         title: "FOOTBALL",
-        minutes: 0,
-        text: "[WHY YOU ENJOY IT]",
-        photo: { label: "PHOTO — FRIENDS / TEAM", src: "" } as Photo,
+        shortLabel: "FOOTBALL",
+        visual: "football",
+        shortText:
+          "I can happily spend an unreasonable amount of time watching a game where one goal changes everything.",
+        description:
+          "I can happily spend an unreasonable amount of time watching a game where one goal changes everything. Ninety minutes of almost nothing happening, and then it does, and everyone loses their minds. I've never really grown out of that.",
       },
       {
-        glyph: "📚",
-        title: "READING / FICTION",
-        minutes: 0,
-        text: "[WHY YOU ENJOY IT]",
+        id: "sudoku",
+        title: "SUDOKU",
+        shortLabel: "SUDOKU",
+        visual: "sudoku",
+        shortText:
+          "There is something deeply satisfying about putting the last number in and knowing the grid has nowhere left to argue.",
+        description:
+          "There is something deeply satisfying about putting the last number in and knowing the grid has nowhere left to argue. No opinions, no negotiation — it either works or it doesn't. I find that genuinely relaxing.",
       },
       {
-        glyph: "✳",
-        title: "[OTHER PASSION]",
-        minutes: 0,
-        text: "[WHY YOU ENJOY IT]",
+        id: "reading",
+        title: "READING",
+        shortLabel: "FICTION",
+        visual: "reading",
+        shortText:
+          "I got back into fiction because sometimes I want a story that has absolutely nothing to do with what I need to get done.",
+        description:
+          "I got back into fiction because sometimes I want a story that has absolutely nothing to do with what I need to get done. Not to learn anything from it. Just to be somewhere else for a bit.",
       },
-    ],
-    mostPlayed: "[PASSION]",
-    mostUnexpected: "[UNEXPECTED INTEREST]",
-    currentObsession: "[CURRENT OBSESSION]",
+      {
+        id: "building",
+        title: "BUILDING THINGS",
+        shortLabel: "BUILDING",
+        visual: "building",
+        shortText:
+          "I enjoy taking something from “this should probably work” to “okay, it actually works.”",
+        description:
+          "I enjoy taking something from “this should probably work” to “okay, it actually works.” The messy middle part is annoying every single time, and I keep going back to it anyway.",
+      },
+      {
+        id: "cardGames",
+        title: "CARD GAMES",
+        shortLabel: "CARD GAMES",
+        visual: "cards",
+        shortText:
+          "I like games where the rules are simple, the stakes somehow become personal, and everyone suddenly becomes very competitive.",
+        description:
+          "I like games where the rules are simple, the stakes somehow become personal, and everyone suddenly becomes very competitive. Nothing is actually on the line, and somehow it still matters to everyone at the table.",
+      },
+    ] as {
+      id: string;
+      title: string;
+      /** Short form used in the footer rotation strip. */
+      shortLabel: string;
+      visual: "chess" | "football" | "sudoku" | "reading" | "building" | "cards";
+      shortText: string;
+      description: string;
+      detail?: { label: string; value: string };
+    }[],
   },
 
   competitive: {
@@ -187,18 +366,6 @@ export const content = {
     final: ["I don't know exactly where the game is going.", "But I know I want to keep playing."],
     signoff: "THANKS FOR PLAYING. ♟",
   },
-
-  /** Click a piece on any chessboard to reveal these. All editable. */
-  easterEggs: {
-    king: { title: "YOU FOUND THE KING.", text: "[SOMETHING YOU PROTECT AT ALL COSTS]" },
-    queen: { title: "EVERYONE CLICKS THE QUEEN FIRST.", text: "[PERSONAL JOKE]" },
-    rook: { title: "THE ROOK WAITS.", text: "[A TIME PATIENCE PAID OFF]" },
-    bishop: { title: "THE BISHOP ONLY SEES ONE COLOUR.", text: "[A BIAS YOU'RE WORKING ON]" },
-    knight: { title: "YOU FOUND THE KNIGHT.", text: "[PERSONAL FUN FACT]" },
-    pawn: { title: "MOST IMPORTANT THINGS STARTED SMALL.", text: "[PERSONAL STORY]" },
-  },
-
-  chapters: ["OPENING", "DEVELOPMENT", "ATTACK", "BLUNDER", "SACRIFICE", "ENDGAME"] as const,
 };
 
 export type Content = typeof content;

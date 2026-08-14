@@ -16,14 +16,14 @@ export function PhotoSlot({
   return (
     <figure className={className}>
       <div
-        className={`relative ${ratio} w-full overflow-hidden rounded-lg border border-border bg-card`}
+        className={`hover-lift relative ${ratio} w-full overflow-hidden rounded-lg border border-border bg-card`}
       >
         {photo.src ? (
           <img
             src={photo.src}
             alt={photo.caption || photo.label}
             loading="lazy"
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover transition-[filter] duration-400 hover:brightness-110"
           />
         ) : (
           <div className="absolute inset-0 grid place-items-center p-6 text-center">

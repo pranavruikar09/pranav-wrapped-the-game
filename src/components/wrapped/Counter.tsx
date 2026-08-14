@@ -12,7 +12,7 @@ export function Counter({
   duration?: number;
   className?: string;
 }) {
-  const { ref, shown } = useReveal<HTMLSpanElement>(0.4);
+  const { ref, shown } = useReveal<HTMLSpanElement>();
   const [n, setN] = useState(0);
 
   useEffect(() => {

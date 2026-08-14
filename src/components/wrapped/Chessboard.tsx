@@ -45,7 +45,7 @@ export function Chessboard({
         })}
       </div>
 
-      {/* destination square */}
+      {/* destination square — only the relevant move glows, kept deliberately prominent */}
       {target && onPlay ? (
         <button
           type="button"
@@ -54,7 +54,8 @@ export function Chessboard({
           className="absolute grid place-items-center"
           style={{ width: "12.5%", height: "12.5%", left: `${target.left}%`, top: `${target.top}%` }}
         >
-          <span className="h-[34%] w-[34%] animate-pulse rounded-full bg-accent/80 shadow-[0_0_24px_var(--accent)]" />
+          <span className="absolute inset-[8%] rounded-md border-2 border-accent/60" />
+          <span className="h-[42%] w-[42%] animate-pulse rounded-full bg-accent/85 shadow-[0_0_10px_2px_var(--accent),0_0_36px_var(--accent)]" />
         </button>
       ) : null}
 
@@ -73,14 +74,22 @@ export function Chessboard({
               white ? "text-piece-light" : "text-piece-dark"
             } ${
               isMover && onPlay
-                ? "z-10 cursor-pointer drop-shadow-[0_0_14px_var(--accent)] hover:scale-110"
+                ? "z-10 cursor-pointer drop-shadow-[0_0_6px_var(--accent)] hover:scale-110"
                 : "pointer-events-none"
             }`}
             style={{ width: "12.5%", height: "12.5%", left: `${left}%`, top: `${top}%` }}
           >
-            <span style={{ fontSize: "9cqw", lineHeight: 1 }}>{GLYPH[p.code]}</span>
+            <span
+              className={isMover && onPlay ? "relative z-10" : ""}
+              style={{ fontSize: "10.5cqw", lineHeight: 1 }}
+            >
+              {GLYPH[p.code]}
+            </span>
             {isMover && onPlay ? (
-              <span className="absolute inset-[6%] animate-pulse rounded-full border-2 border-accent" aria-hidden />
+              <span
+                className="absolute inset-[4%] animate-pulse rounded-full border-2 border-accent shadow-[0_0_16px_2px_var(--accent)]"
+                aria-hidden
+              />
             ) : null}
           </button>
         );
