@@ -45,11 +45,15 @@ export const content = {
     voice:
       "[SHORT INTRO IN YOUR OWN VOICE — 3 or 4 sentences. Who you are on an ordinary Tuesday, not on a CV. What you're curious about. What you're bad at pretending to care about.]",
     portrait: { label: "ME", src: "/Photos/Raigad.jpeg", caption: "" } as Photo,
-    /** Three small personal photos for the journey page. Add real files under /public and set `src`. */
+    /** The left photo rail on the journey page — a visual scrapbook that runs
+     *  alongside the timeline. Page-level content: these are NOT tied to any
+     *  journey node. Add real files under /public/Photos and set `src`. */
     photos: [
       { label: "PHOTO — SMALL-TOWN ROOTS", src: "/Photos/Village.jpeg", caption: "MY VILLAGE" },
       { label: "PHOTO — HOSTEL LIFE", src: "/Photos/Hostel.jpeg", caption: "HOSTEL LIFE" },
       { label: "PHOTO — A NEW CHAPTER", src: "/Photos/IIM_Mumbai_cropped.jpg", caption: "A NEW CHAPTER" },
+      { label: "PHOTO — FRIENDS", src: "/Photos/Sendoff.jpeg", caption: "MEMORIES ALONG THE WAY" },
+      { label: "PHOTO — HOUSE CAPTAIN", src: "/Photos/House_Captain.jpeg", caption: "HOUSE CAPTAIN" },
     ] as Photo[],
     /**
      * The journey map. Order matters — it's drawn as a path in this order.
@@ -211,7 +215,7 @@ export const content = {
     operatingSystem:
       "[SHORT PERSONAL DESCRIPTION — how your head currently runs. One or two lines.]",
     /** The Spotify-Wrapped-style label for who you are. */
-    personalityType: "The JUST IN CASE PACKER",
+    personalityType: "THE SERIAL TAB CLOSER",
   },
 
   passions: {

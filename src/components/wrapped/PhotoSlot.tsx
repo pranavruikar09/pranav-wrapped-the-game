@@ -8,10 +8,13 @@ export function PhotoSlot({
   photo,
   className = "",
   ratio = "aspect-[4/5]",
+  captionClassName = "mt-3 font-mono text-[0.65rem] tracking-[0.2em] text-muted-foreground",
 }: {
   photo: Photo;
   className?: string;
   ratio?: string;
+  /** Override when a dense rail needs tighter caption spacing than the default. */
+  captionClassName?: string;
 }) {
   return (
     <figure className={className}>
@@ -38,11 +41,7 @@ export function PhotoSlot({
           </div>
         )}
       </div>
-      {photo.caption ? (
-        <figcaption className="mt-3 font-mono text-[0.65rem] tracking-[0.2em] text-muted-foreground">
-          {photo.caption}
-        </figcaption>
-      ) : null}
+      {photo.caption ? <figcaption className={captionClassName}>{photo.caption}</figcaption> : null}
     </figure>
   );
 }

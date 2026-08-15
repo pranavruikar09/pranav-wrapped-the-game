@@ -411,20 +411,22 @@ type JourneyEntry = (typeof content.intro.journey)[number];
 /** Hand-placed (x%, y%) position of each journey entry, in the same order as
  * `content.intro.journey`. Presentation only — the facts live in cv.ts. */
 const JOURNEY_LAYOUT: { x: number; y: number }[] = [
-  { x: 4, y: 6 }, // 0 Salwadgaon — start
-  { x: 22, y: 20 }, // 1 Ahmednagar
-  { x: 4, y: 40 }, // 2 Shevgaon
-  { x: 17, y: 58 }, // 3 School — House Captain (sub)
-  { x: 32, y: 66 }, // 4 School — Head Boy (sub)
-  { x: 36, y: 40 }, // 5 Pune — JEE prep
-  { x: 50, y: 16 }, // 6 JEE — blunder
-  { x: 54, y: 58 }, // 7 Karad
-  { x: 45, y: 78 }, // 8 Karad — Robotics (sub)
-  { x: 62, y: 84 }, // 9 Karad — Indoor Games (sub)
-  { x: 74, y: 38 }, // 10 Pune — first job
-  { x: 92, y: 14 }, // 11 CAT — blunder
-  { x: 90, y: 60 }, // 12 Mumbai — current
+  { x: 4, y: 7 }, // 0 Salwadgaon — start
+  { x: 20, y: 18 }, // 1 Ahmednagar
+  { x: 5, y: 38 }, // 2 Shevgaon
+  { x: 20, y: 54 }, // 3 School — House Captain (sub)
+  { x: 36, y: 58 }, // 4 School — Head Boy (sub)
+  { x: 39, y: 10 }, // 5 Pune — JEE prep
+  { x: 57, y: 12 }, // 6 JEE — blunder
+  { x: 56, y: 42 }, // 7 Karad
+  { x: 56, y: 64 }, // 8 Karad — Robotics (sub)
+  { x: 59, y: 85 }, // 9 Karad — Indoor Games (sub)
+  { x: 73, y: 25 }, // 10 Pune — first job
+  { x: 91, y: 9 }, // 11 CAT — blunder
+  { x: 90, y: 54 }, // 12 Mumbai — current
 ];
+/** The lower-left of the timeline box is deliberately left empty by the layout
+ *  above — JourneyLegend is overlaid there (see Player). */
 /** Indices, in path order, that form the main route. Sub/blunder entries branch off it instead. */
 const JOURNEY_MAIN_PATH = [0, 1, 2, 5, 7, 10, 12];
 /** [parentIndex, childIndex] — every non-main-path node branches off one neighbour. */
@@ -743,9 +745,51 @@ function Journey({
  */
 function OpeningPhotoRail({ photos }: { photos: Photo[] }) {
   return (
-    <div className="hidden min-w-0 lg:flex lg:flex-col lg:items-stretch lg:justify-start lg:gap-3">
+    // Each photo takes an equal share of the rail's height rather than a fixed
+    // aspect ratio, so the strip stays exactly one viewport tall no matter how
+    // many photos the content file lists. object-cover (in PhotoSlot) keeps
+    // them undistorted as the derived aspect changes.
+    <div className="hidden h-full min-h-0 min-w-0 lg:flex lg:flex-col lg:gap-2">
       {photos.map((p, i) => (
-        <PhotoSlot key={i} photo={p} ratio="aspect-[4/3]" />
+        <PhotoSlot
+          key={i}
+          photo={p}
+          className="flex min-h-0 flex-1 flex-col"
+          ratio="min-h-0 flex-1"
+          captionClassName="mt-1 shrink-0 font-mono text-[0.55rem] leading-tight tracking-[0.16em] text-muted-foreground"
+        />
+      ))}
+    </div>
+  );
+}
+
+/** Key to the timeline's icon vocabulary. A sibling of Journey (Journey draws
+ *  only the timeline), overlaid on the empty lower-left of the timeline box. */
+const JOURNEY_LEGEND: { icon: JourneyIconKind; label: string; danger?: boolean }[] = [
+  { icon: "home", label: "HOME / EARLY LIFE" },
+  { icon: "book", label: "EXAMS / PREPARATION" },
+  { icon: "graduation", label: "EDUCATION" },
+  { icon: "x", label: "SETBACK / FAILURE", danger: true },
+  { icon: "crown", label: "ACHIEVEMENTS" },
+  { icon: "robot", label: "CLUBS / INTERESTS" },
+  { icon: "briefcase", label: "WORK / PROFESSIONAL" },
+  { icon: "trophy", label: "SPORTS / ACTIVITIES" },
+];
+
+function JourneyLegend() {
+  return (
+    <div className="grid grid-cols-2 gap-x-5 gap-y-1.5 rounded-xl border border-border/70 bg-card/40 px-4 py-3 backdrop-blur-sm">
+      {JOURNEY_LEGEND.map((item) => (
+        <div key={item.label} className="flex items-center gap-2">
+          <span
+            className={`h-3.5 w-3.5 shrink-0 ${item.danger ? "text-destructive/80" : "text-muted-foreground"}`}
+          >
+            <JourneyIcon kind={item.icon} />
+          </span>
+          <span className="font-mono text-[0.55rem] uppercase tracking-[0.15em] text-muted-foreground">
+            {item.label}
+          </span>
+        </div>
       ))}
     </div>
   );
@@ -928,11 +972,11 @@ function Player({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) 
         <div className="mx-auto h-full min-h-0 w-full max-w-7xl lg:pr-32">
           {/* Page-level 3-region layout: OpeningPhotoRail | journey column | OpeningPortrait.
               These are grid SIBLINGS, not children of Journey — Journey only ever draws
-              the timeline itself. Columns sized to spec: ~160px rail, fluid centre,
-              ~190px portrait, 28px column gap. */}
-          <div className="grid h-full min-h-0 grid-cols-1 gap-3 lg:grid-cols-[160px_minmax(0,1fr)_190px] lg:gap-x-7 lg:gap-y-3">
+              the timeline itself. Columns land on roughly 18% / 65% / 17% of the
+              content width, the split the design calls for. */}
+          <div className="grid h-full min-h-0 grid-cols-1 gap-3 lg:grid-cols-[210px_minmax(0,1fr)_190px] lg:gap-x-7 lg:gap-y-3">
             {/* left: memory rail — desktop/tablet only, starts below Sound Off */}
-            <Reveal delay={120} className="lg:pt-1">
+            <Reveal delay={120} className="min-h-0">
               <OpeningPhotoRail photos={c.photos} />
             </Reveal>
 
@@ -968,15 +1012,27 @@ function Player({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) 
                 </Reveal>
               </div>
 
-              <Reveal delay={160} className="relative min-h-0 flex-1">
-                <Journey
-                  entries={c.journey}
-                  hovered={hoveredJourney}
-                  onEnter={setHoveredJourney}
-                  onLeave={(i) => setHoveredJourney((h) => (h === i ? null : h))}
-                  onToggle={(i) => setHoveredJourney((h) => (h === i ? null : i))}
-                />
-              </Reveal>
+              {/* Timeline region. Journey and JourneyLegend are SIBLINGS here —
+                  Journey renders only the timeline; the legend is overlaid on
+                  the empty lower-left that JOURNEY_LAYOUT reserves for it. */}
+              <div className="relative min-h-0 flex-1">
+                <Reveal delay={160} className="h-full">
+                  <Journey
+                    entries={c.journey}
+                    hovered={hoveredJourney}
+                    onEnter={setHoveredJourney}
+                    onLeave={(i) => setHoveredJourney((h) => (h === i ? null : h))}
+                    onToggle={(i) => setHoveredJourney((h) => (h === i ? null : i))}
+                  />
+                </Reveal>
+
+                <Reveal
+                  delay={300}
+                  className="pointer-events-none absolute bottom-0 left-0 hidden xl:block"
+                >
+                  <JourneyLegend />
+                </Reveal>
+              </div>
             </div>
 
             {/* right: portrait — desktop/tablet only, top-aligned below "01 / OPENING" */}
