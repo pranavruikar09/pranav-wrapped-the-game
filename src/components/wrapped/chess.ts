@@ -45,21 +45,31 @@ export function startingPieces(): Piece[] {
 }
 
 /**
- * One coherent game: Italian-ish opening, a blunder, then a bare endgame.
- * Seven half-moves — one per content chapter. (The castle that used to sit
- * between the bishop move and the blunder was cut when the Competition
- * chapter was removed; nothing downstream depended on it, so the rest of
- * the game is untouched and still fully legal.)
+ * Scholar's Mate — seven half-moves, one per content chapter, ending on a
+ * real checkmate rather than a position that merely looks like one. Every
+ * entry is the legal consequence of the one before it, so `positionAfter`
+ * reaches the mate by replaying the line rather than by hand-placing pieces.
+ *
+ * Why it's mate after 4. Qxf7#: the queen sits adjacent to the black king and
+ * is defended by the c4 bishop (c4–d5–e6–f7 is clear). The king has no square
+ * (d7/d8/f8 are its own pieces, e7 is covered by the queen, f7 is defended);
+ * nothing black has can take on f7 (neither knight covers it, the f8 bishop
+ * can't move down a file, d8–f7 isn't a queen line); and there is no square
+ * between f7 and e8 to interpose on.
  */
 export const MOVES: Move[] = [
   { from: "e2", to: "e4", notation: "1. e4", hint: "Open the game. Push the glowing pawn forward." },
   { from: "e7", to: "e5", notation: "1… e5", hint: "The other side answers. Move the glowing pawn." },
-  { from: "g1", to: "f3", notation: "2. Nf3", hint: "Develop the knight towards the centre." },
-  { from: "b8", to: "c6", notation: "2… Nc6", hint: "Bring the black knight out." },
+  { from: "d1", to: "h5", notation: "2. Qh5", hint: "Bring the queen out early. Confident, or reckless." },
+  { from: "b8", to: "c6", notation: "2… Nc6", hint: "Black defends the pawn. Sensible enough." },
   { from: "f1", to: "c4", notation: "3. Bc4", hint: "Aim the bishop at the weakest square." },
-  { from: "c6", to: "d4", notation: "3… Nd4?", hint: "Move the knight. This one is a mistake." },
-  { from: "f3", to: "d4", notation: "4. Nxd4", hint: "Take the knight. Endgames are made of these." },
+  { from: "g8", to: "f6", notation: "3… Nf6??", hint: "Black develops — and misses what's coming." },
+  { from: "h5", to: "f7", notation: "4. Qxf7#", hint: "Take on f7. That's the game." },
 ];
+
+/** The move the game ends on. Read from MOVES so the Endgame page's caption
+ *  can never drift out of sync with the line actually being played. */
+export const FINAL_MOVE = MOVES[MOVES.length - 1]!;
 
 /** Apply the first `count` moves to the starting position. */
 export function positionAfter(count: number): Piece[] {

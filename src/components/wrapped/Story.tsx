@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type CSSProperties } from "react";
 import { content, type Photo, type WrappedCard as WrappedCardData } from "@/content/cv";
 import { Chessboard } from "./Chessboard";
-import { MOVES, applyMove, positionAfter, type Piece } from "./chess";
+import { FINAL_MOVE, MOVES, applyMove, positionAfter, type Piece } from "./chess";
 import { ChapterLayout } from "./ChapterLayout";
 import { PhotoSlot } from "./PhotoSlot";
 import { ChapterTag, Reveal } from "./Reveal";
@@ -307,6 +307,11 @@ function ChessMoveTransition({
         <p className="mt-3 font-mono text-sm tracking-[0.25em] text-muted-foreground">
           {move.notation}
         </p>
+        {played && isFinalMove ? (
+          <p className="mt-1 animate-fade-in font-display text-lg uppercase tracking-[0.2em] text-accent sm:text-xl">
+            Checkmate.
+          </p>
+        ) : null}
         {!played ? (
           <>
             <p className="mt-1 font-mono text-sm tracking-[0.2em] text-muted-foreground/70">
@@ -2376,7 +2381,12 @@ function Endgame({
         <div className="grid shrink-0 gap-6 lg:grid-cols-[auto_1fr] lg:items-center lg:gap-10">
           <Reveal className="mx-auto lg:mx-0">
             <Chessboard pieces={pieces} size={BOARD_SIZE_ENDGAME} />
-            <p className="mt-3 text-center font-mono text-sm tracking-[0.2em] text-muted-foreground lg:text-left">
+            {/* The board above is replayed from MOVES, so this is the real
+                final position — the notation is read from the same source. */}
+            <p className="mt-3 text-center font-mono text-xs tracking-[0.25em] text-accent lg:text-left">
+              {FINAL_MOVE.notation} · CHECKMATE
+            </p>
+            <p className="mt-1 text-center font-mono text-sm tracking-[0.2em] text-muted-foreground lg:text-left">
               SAME BOARD. DIFFERENT <span className="text-accent">POSITION.</span>
             </p>
           </Reveal>
