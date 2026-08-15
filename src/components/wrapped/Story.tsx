@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type CSSProperties } from "react";
-import { content, type WrappedCard as WrappedCardData } from "@/content/cv";
+import { content, type Photo, type WrappedCard as WrappedCardData } from "@/content/cv";
 import { Chessboard } from "./Chessboard";
 import { MOVES, applyMove, positionAfter, type Piece } from "./chess";
 import { ChapterLayout } from "./ChapterLayout";
@@ -610,6 +610,34 @@ function Journey({
   );
 }
 
+/**
+ * Page-level regions of the Opening layout, siblings of Journey — not
+ * rendered by it. Journey only ever draws the timeline itself; the photo
+ * rail and portrait are laid out by Player's grid, exactly like the trait
+ * cards and nav are laid out by ChapterLayout's footer rather than by
+ * whatever chapter content sits above them.
+ */
+function OpeningPhotoRail({ photos }: { photos: Photo[] }) {
+  return (
+    <div className="hidden min-w-0 lg:flex lg:flex-col lg:items-stretch lg:justify-start lg:gap-3">
+      {photos.map((p, i) => (
+        <PhotoSlot key={i} photo={p} ratio="aspect-[4/3]" />
+      ))}
+    </div>
+  );
+}
+
+function OpeningPortrait({ portrait, tag }: { portrait: Photo; tag: string }) {
+  return (
+    <div className="hidden min-w-0 lg:block">
+      <PhotoSlot photo={portrait} />
+      <p className="mt-2 text-center font-mono text-sm tracking-[0.25em] text-muted-foreground">
+        {tag}
+      </p>
+    </div>
+  );
+}
+
 /* ─────────────── trait cards + centered overlay ─────────────── */
 
 const TRAIT_ICONS = ["🧭", "🧩", "🔍", "🌱"];
@@ -767,20 +795,22 @@ function Player({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) 
           </Reveal>
         }
       >
-        <div className="mx-auto h-full min-h-0 w-full max-w-7xl">
-          <div className="grid h-full min-h-0 grid-cols-1 gap-3 lg:grid-cols-[10rem_1fr_14rem] lg:gap-6">
-            {/* left: 3 personal photos — a memory rail, independent of the journey.
-                Desktop/tablet only; starts at the very top, level with Sound Off. */}
-            <Reveal
-              delay={120}
-              className="hidden min-w-0 lg:flex lg:flex-col lg:items-stretch lg:justify-start lg:gap-3"
-            >
-              {c.photos.map((p, i) => (
-                <PhotoSlot key={i} photo={p} ratio="aspect-[4/3]" />
-              ))}
+        {/* lg:pr-32 keeps the portrait clear of the fixed right chapter rail —
+            same clearance pattern used on Blunder/Loreal/Wrapped's content
+            containers, needed here for the same reason: at ~1366px wide the
+            rail sits at ~1212px and unpadded content runs edge-to-edge. */}
+        <div className="mx-auto h-full min-h-0 w-full max-w-7xl lg:pr-32">
+          {/* Page-level 3-region layout: OpeningPhotoRail | journey column | OpeningPortrait.
+              These are grid SIBLINGS, not children of Journey — Journey only ever draws
+              the timeline itself. Columns sized to spec: ~160px rail, fluid centre,
+              ~190px portrait, 28px column gap. */}
+          <div className="grid h-full min-h-0 grid-cols-1 gap-3 lg:grid-cols-[160px_minmax(0,1fr)_190px] lg:gap-x-7 lg:gap-y-3">
+            {/* left: memory rail — desktop/tablet only, starts below Sound Off */}
+            <Reveal delay={120} className="lg:pt-1">
+              <OpeningPhotoRail photos={c.photos} />
             </Reveal>
 
-            {/* center: heading + journey, unchanged in size/position */}
+            {/* centre: heading + journey, unchanged in size/position */}
             <div className="flex min-h-0 min-w-0 flex-col gap-2">
               <div className="shrink-0">
                 {/* compact mobile photo strip — the memory rail becomes a small row here,
@@ -810,12 +840,9 @@ function Player({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) 
               </Reveal>
             </div>
 
-            {/* right: portrait, top-aligned below "01 / OPENING" — desktop/tablet only */}
-            <Reveal delay={140} className="hidden min-w-0 lg:block">
-              <PhotoSlot photo={{ label: c.portrait.label, src: c.portrait.src ?? "" }} />
-              <p className="mt-2 text-center font-mono text-sm tracking-[0.25em] text-muted-foreground">
-                {content.name} / 01
-              </p>
+            {/* right: portrait — desktop/tablet only, top-aligned below "01 / OPENING" */}
+            <Reveal delay={140} className="lg:pt-1">
+              <OpeningPortrait portrait={c.portrait} tag={`${content.name} / 01`} />
             </Reveal>
           </div>
         </div>
@@ -1224,47 +1251,61 @@ function FamilyIcon({ kind }: { kind: "heart" | "shield" | "hands" }) {
 }
 
 type FamilyMember = (typeof content.beauty)["mother"];
+/** accent = full lime (mother), neutral = off-white (father), soft = muted
+ *  lime (brother) — three readings of the existing palette, no new hues. */
+type FamilyTone = "accent" | "neutral" | "soft";
 
 function FamilyCard({
   person,
   icon,
+  tone,
   featured,
 }: {
   person: FamilyMember;
   icon: "heart" | "shield" | "hands";
+  tone: FamilyTone;
   featured?: boolean;
 }) {
+  const traitColor =
+    tone === "accent" ? "text-accent" : tone === "soft" ? "text-accent/70" : "text-foreground";
   return (
     <div
-      className={`group relative flex h-full flex-col rounded-2xl border p-3 transition-all duration-300 hover:-translate-y-1 sm:p-4 ${
+      className={`group relative flex h-full flex-col justify-center rounded-2xl border p-5 transition-all duration-300 hover:-translate-y-1 sm:min-h-[300px] sm:p-6 ${
         featured
-          ? "border-accent/50 bg-secondary lg:scale-[1.04]"
+          ? "border-accent/50 bg-secondary lg:scale-[1.03]"
           : "border-border/80 bg-secondary/70 hover:border-accent/50"
       }`}
     >
-      <div className="flex items-center gap-2">
-        <span
-          className={`grid h-6 w-6 shrink-0 place-items-center rounded-full border p-1.5 text-accent transition-transform duration-300 group-hover:scale-110 ${
-            featured ? "border-accent/60" : "border-accent/30"
-          }`}
-        >
-          <FamilyIcon kind={icon} />
-        </span>
-        <span className="font-mono text-[0.65rem] tracking-[0.25em] text-muted-foreground">
-          {person.relation}
-        </span>
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <span
+            className={`grid h-6 w-6 shrink-0 place-items-center rounded-full border p-1.5 text-accent transition-transform duration-300 group-hover:scale-110 ${
+              featured ? "border-accent/60" : "border-accent/30"
+            }`}
+          >
+            <FamilyIcon kind={icon} />
+          </span>
+          <span className="font-mono text-[0.65rem] tracking-[0.25em] text-muted-foreground">
+            {person.relation}
+          </span>
+        </div>
+        {/* small reserved corner frame — real photos drop straight in later
+            without touching layout; kept small so it stays an accent, not
+            the card's main event. */}
+        <PhotoSlot
+          photo={person.photo}
+          ratio="aspect-square"
+          className="w-11 shrink-0 overflow-hidden transition-transform duration-300 group-hover:scale-105"
+        />
       </div>
-      <h3 className="mt-1.5 font-display text-xl uppercase leading-none tracking-tight text-foreground transition-colors duration-300 group-hover:text-accent sm:text-2xl">
+
+      <h3
+        className={`mt-3 font-display text-2xl uppercase leading-none tracking-tight transition-colors duration-300 sm:text-[1.75rem] ${traitColor}`}
+      >
         {person.trait}
       </h3>
 
-      <PhotoSlot
-        photo={person.photo}
-        ratio="aspect-[4/5]"
-        className="mx-auto mt-2 max-w-[6.5rem] transition-transform duration-300 group-hover:scale-[1.02] sm:max-w-[7.5rem]"
-      />
-
-      <p className="relative mt-2 flex-1 text-[0.78rem] leading-snug text-foreground/75 transition-colors duration-300 group-hover:text-foreground/90 sm:text-[0.85rem]">
+      <p className="mt-2 text-[0.8rem] leading-snug text-foreground/75 transition-colors duration-300 group-hover:text-foreground/90 sm:text-[0.85rem]">
         &ldquo;{person.quote}&rdquo;
       </p>
     </div>
@@ -1280,7 +1321,13 @@ function Beauty({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) 
       header={<ChapterTag chapter={c.chapter} move="MOVE 03" />}
       footer={<MoveNav onPrev={onPrev} onNext={onNext} />}
     >
-      <div className="mx-auto flex h-full min-h-0 w-full max-w-6xl flex-col gap-3">
+      {/* justify-center groups heading + cards + closing line as one block and
+          centres it in the available height — the cards size to their own
+          content (height: auto) instead of stretching to fill the chapter. */}
+      {/* lg:pr-32 clears the fixed right chapter rail — same pattern already
+          used on Blunder/Loreal/Player's content containers; at ~1366px wide
+          the rail sits at ~1212px and unpadded content ran past it. */}
+      <div className="mx-auto flex h-full min-h-0 w-full max-w-6xl flex-col justify-center gap-5 lg:pr-32">
         <div className="shrink-0 text-center">
           <Reveal>
             <p className="font-mono text-sm tracking-[0.3em] text-muted-foreground">{c.label}</p>
@@ -1297,15 +1344,15 @@ function Beauty({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) 
           </Reveal>
         </div>
 
-        <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 sm:grid-cols-3 sm:items-center sm:gap-4">
-          <Reveal delay={200} className="h-full min-h-0">
-            <FamilyCard person={c.mother} icon="heart" />
+        <div className="grid shrink-0 grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+          <Reveal delay={200} className="h-full">
+            <FamilyCard person={c.mother} icon="heart" tone="accent" />
           </Reveal>
-          <Reveal delay={280} className="h-full min-h-0">
-            <FamilyCard person={c.father} icon="shield" featured />
+          <Reveal delay={280} className="h-full">
+            <FamilyCard person={c.father} icon="shield" tone="neutral" featured />
           </Reveal>
-          <Reveal delay={360} className="h-full min-h-0">
-            <FamilyCard person={c.brother} icon="hands" />
+          <Reveal delay={360} className="h-full">
+            <FamilyCard person={c.brother} icon="hands" tone="soft" />
           </Reveal>
         </div>
 

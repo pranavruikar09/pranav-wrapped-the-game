@@ -44,12 +44,12 @@ export const content = {
     /** Write this the way you'd say it out loud, not the way you'd write it on LinkedIn. */
     voice:
       "[SHORT INTRO IN YOUR OWN VOICE — 3 or 4 sentences. Who you are on an ordinary Tuesday, not on a CV. What you're curious about. What you're bad at pretending to care about.]",
-    portrait: { label: "PHOTO — PORTRAIT", src: "", caption: "[optional caption]" } as Photo,
+    portrait: { label: "ME", src: "/Photos/Raigad.jpeg", caption: "" } as Photo,
     /** Three small personal photos for the journey page. Add real files under /public and set `src`. */
     photos: [
-      { label: "PHOTO — SMALL-TOWN ROOTS", src: "", caption: "SMALL-TOWN ROOTS" },
-      { label: "PHOTO — HOSTEL LIFE", src: "", caption: "HOSTEL LIFE" },
-      { label: "PHOTO — A NEW CHAPTER", src: "", caption: "A NEW CHAPTER" },
+      { label: "PHOTO — SMALL-TOWN ROOTS", src: "/Photos/Village.jpeg", caption: "SMALL-TOWN ROOTS" },
+      { label: "PHOTO — HOSTEL LIFE", src: "/Photos/Hostel.jpeg", caption: "HOSTEL LIFE" },
+      { label: "PHOTO — A NEW CHAPTER", src: "/Photos/IIM_Mumbai_cropped.jpg", caption: "A NEW CHAPTER" },
     ] as Photo[],
     /**
      * The journey map. Order matters — it's drawn as a path in this order.
@@ -166,26 +166,26 @@ export const content = {
     traits: [
       {
         trait: "OPEN-MINDED",
-        text: "Moving through very different environments taught me that my way isn't necessarily the only way. I genuinely enjoy hearing how other people approach the same problem.",
+        text: "I've lived in a village, a hostel, a small town, a bigger city and now Mumbai. Every move meant getting used to people and ways of doing things that weren't mine. I learned to adapt before I learned to have an opinion.",
       },
       {
         trait: "SELF-RELIANT",
-        text: "Responsibility became a default setting for me rather than something I consciously learned. I am usually comfortable figuring things out before asking someone else to do it for me.",
+        text: "Living away from home from the age of four probably had something to do with this. I've gotten used to handling things myself — although I still occasionally call home when I can't figure something out.",
       },
       {
         trait: "CURIOUS",
-        text: "I tend to ask one more question than necessary. Sometimes that leads somewhere useful. Sometimes it leads to a 20-minute rabbit hole.",
+        text: "I ask a lot of questions. Some are useful, some are unnecessary, and some somehow turn into a 20-minute rabbit hole. I haven't decided which category I prefer.",
       },
       {
         trait: "RESILIENT",
-        text: "[WHY THIS TRAIT — one or two honest sentences about landing in new places/situations and adjusting fast.]",
+        text: "JEE didn't work out. Neither did my first CAT attempt. Neither felt particularly great at the time. But I've become fairly comfortable with things not going according to plan and trying again.",
       },
     ],
     mostLikelyTo: "[PERSONAL QUIRK — the thing your friends would bet money on you doing]",
     operatingSystem:
       "[SHORT PERSONAL DESCRIPTION — how your head currently runs. One or two lines.]",
     /** The Spotify-Wrapped-style label for who you are. */
-    personalityType: "THE CURIOUS COMPETITOR",
+    personalityType: "The JUST IN CASE PACKER",
   },
 
   passions: {
@@ -229,7 +229,7 @@ export const content = {
         shortText:
           "There is something deeply satisfying about putting the last number in and knowing the grid has nowhere left to argue.",
         description:
-          "There is something deeply satisfying about putting the last number in and knowing the grid has nowhere left to argue. No opinions, no negotiation — it either works or it doesn't. I find that genuinely relaxing.",
+          "There is something deeply satisfying about putting the last number in and knowing the grid has nowhere left to argue. No opinions, no negotiation - it either works or it doesn't. I find that genuinely relaxing.",
       },
       {
         id: "reading",
