@@ -18,7 +18,10 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
 
-  --font-display: "Anton", "Arial Narrow", sans-serif;
+  /* Display face is a normal-width grotesque, not a condensed poster face:
+     headings here are large uppercase phrases, and a condensed cut makes them
+     read as one solid block at that size. */
+  --font-display: "Archivo", "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
 
@@ -111,12 +114,71 @@
     color: var(--accent-foreground);
   }
 
+  /* Headings default to a heavy weight and neutral tracking. The old -0.01em
+     tightening existed to tame a condensed face; with a normal-width display
+     font it just pushes uppercase letterforms into each other. */
   h1,
   h2,
   h3 {
     font-family: var(--font-display);
-    letter-spacing: -0.01em;
+    font-weight: 700;
+    letter-spacing: 0;
   }
+
+  /* Uppercase needs a little positive tracking to stay legible — lowercase
+     sidebearings are what normally separate glyphs, and caps don't have them. */
+  h1.uppercase,
+  h2.uppercase,
+  h3.uppercase {
+    letter-spacing: 0.01em;
+  }
+
+  /* Roughly half the display-font elements are <p>/<span>, not headings. The
+     previous face shipped a single heavy weight so they looked bold for free;
+     this one doesn't, so the utility carries the weight itself. Declared in
+     @layer base so any explicit font-* utility still wins. */
+  .font-display {
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  }
+}
+
+/*
+ * Type scale. Sizes are clamped so headings stay in the intended band across
+ * viewports without overflowing their column.
+ */
+@utility text-hero {
+  font-size: clamp(2.25rem, 4.4vw, 4.25rem); /* 36 → 68px */
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: 0.005em;
+}
+
+@utility text-section {
+  font-size: clamp(1.5rem, 2.6vw, 2.5rem); /* 24 → 40px */
+  font-weight: 700;
+  line-height: 1.06;
+  letter-spacing: 0.01em;
+}
+
+@utility text-card-title {
+  font-size: clamp(1.0625rem, 1.25vw, 1.375rem); /* 17 → 22px */
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0.012em;
+}
+
+/* Body copy sits at 15–17px with a comfortable measure. */
+@utility text-body {
+  font-size: clamp(0.9375rem, 0.9vw, 1.0625rem);
+  font-weight: 400;
+  line-height: 1.55;
+}
+
+@utility text-meta {
+  font-size: clamp(0.75rem, 0.8vw, 0.875rem);
+  font-weight: 500;
+  line-height: 1.35;
 }
 
 /* Fine film grain used behind photo placeholders and cream panels */

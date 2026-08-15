@@ -717,7 +717,7 @@ function Journey({
           <p className="mt-0.5 font-mono text-[0.65rem] uppercase tracking-[0.1em] text-muted-foreground">
             {entries[hovered]!.label}
           </p>
-          <p className="mt-1.5 text-[0.8rem] leading-snug text-foreground/85">
+          <p className="mt-1.5 text-[0.875rem] leading-[1.5] text-foreground/85">
             {entries[hovered]!.description}
           </p>
         </div>
@@ -824,7 +824,7 @@ function OpeningProfileCard({
 
         <div className="mt-2 space-y-1.5">
           {profile.story.map((line) => (
-            <p key={line} className="text-[0.68rem] leading-snug text-foreground/75">
+            <p key={line} className="text-[0.8125rem] leading-[1.5] text-foreground/75">
               {line}
             </p>
           ))}
@@ -877,7 +877,7 @@ function TraitCard({
         {icon}
       </span>
       <span
-        className={`font-display text-sm uppercase leading-tight tracking-tight sm:text-base ${
+        className={`font-display text-sm uppercase leading-tight tracking-[0.012em] sm:text-base ${
           active ? "text-accent" : "text-foreground"
         }`}
       >
@@ -1274,7 +1274,7 @@ function PassionCard({ item, onOpen }: { item: PassionItem; onOpen: () => void }
           <PassionIcon visual={item.visual} />
         </span>
         <h3
-          className={`font-display text-base uppercase leading-none tracking-tight transition-colors sm:text-lg lg:text-xl ${accent}`}
+          className={`font-display text-base uppercase leading-none tracking-[0.012em] transition-colors sm:text-lg lg:text-xl ${accent}`}
         >
           {item.title}
         </h3>
@@ -1285,7 +1285,7 @@ function PassionCard({ item, onOpen }: { item: PassionItem; onOpen: () => void }
           sizing lives on the wrapper: -webkit-line-clamp and `flex-1` on the
           same element fight each other, and the box stretches past the clamp. */}
       <div className="relative mt-1.5 min-h-0 flex-1 sm:mt-2">
-        <p className="line-clamp-3 max-w-[46ch] pr-2 text-[0.8rem] leading-snug text-foreground/75 transition-colors group-hover:text-foreground/90 sm:line-clamp-none sm:text-sm">
+        <p className="line-clamp-3 max-w-[46ch] pr-2 text-[0.875rem] leading-[1.5] text-foreground/75 transition-colors group-hover:text-foreground/90 sm:line-clamp-none sm:text-sm">
           {item.shortText}
         </p>
       </div>
@@ -1570,12 +1570,12 @@ function FamilyCard({
       </div>
 
       <h3
-        className={`mt-3 font-display text-2xl uppercase leading-none tracking-tight transition-colors duration-300 sm:text-[1.75rem] ${traitColor}`}
+        className={`mt-3 font-display text-2xl uppercase leading-none tracking-[0.012em] transition-colors duration-300 sm:text-[1.75rem] ${traitColor}`}
       >
         {person.trait}
       </h3>
 
-      <p className="mt-2 text-[0.8rem] leading-snug text-foreground/75 transition-colors duration-300 group-hover:text-foreground/90 sm:text-[0.85rem]">
+      <p className="mt-2 text-[0.875rem] leading-[1.5] text-foreground/75 transition-colors duration-300 group-hover:text-foreground/90 sm:text-[0.9375rem]">
         &ldquo;{person.quote}&rdquo;
       </p>
     </div>
@@ -1669,10 +1669,10 @@ function TraitMatchCard({
       <span className="mt-2 grid h-9 w-9 shrink-0 place-items-center rounded-full border border-accent/40 p-2 text-accent transition-transform duration-300 group-hover:scale-110 sm:h-10 sm:w-10">
         <AnalysisIcon kind={item.icon} />
       </span>
-      <h3 className="mt-2.5 font-display text-sm uppercase leading-tight tracking-tight text-foreground sm:text-base lg:text-lg">
+      <h3 className="mt-2.5 font-display text-sm uppercase leading-tight tracking-[0.012em] text-foreground sm:text-base lg:text-lg">
         {item.title}
       </h3>
-      <p className="mt-1.5 line-clamp-3 text-[0.72rem] leading-snug text-muted-foreground transition-colors group-hover:text-foreground/80 sm:line-clamp-none sm:text-[0.8rem]">
+      <p className="mt-1.5 line-clamp-3 text-[0.8125rem] leading-[1.5] text-muted-foreground transition-colors group-hover:text-foreground/80 sm:line-clamp-none sm:text-[0.9375rem]">
         {item.text}
       </p>
       {/* Fixed height (not aspect-ratio) so the image's contribution to the
@@ -1758,7 +1758,7 @@ function Loreal({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) 
               </h2>
             </Reveal>
             <Reveal delay={140}>
-              <p className="mx-auto mt-1 max-w-2xl font-display text-base uppercase leading-tight tracking-tight text-foreground sm:text-xl">
+              <p className="mx-auto mt-1 max-w-2xl font-display text-base uppercase leading-tight tracking-[0.012em] text-foreground sm:text-xl">
                 {c.brandLine}
               </p>
             </Reveal>
@@ -1918,10 +1918,10 @@ function AnalysisRow({
         <AnalysisIcon kind={item.icon} />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block font-display text-base uppercase leading-tight tracking-tight text-foreground transition-colors sm:text-lg lg:text-xl">
+        <span className="block font-display text-base uppercase leading-tight tracking-[0.012em] text-foreground transition-colors sm:text-lg lg:text-xl">
           {item.title}
         </span>
-        <span className="mt-1 block text-[0.78rem] leading-snug text-muted-foreground transition-colors group-hover:text-foreground/80 sm:text-sm">
+        <span className="mt-1 block text-[0.875rem] leading-[1.5] text-muted-foreground transition-colors group-hover:text-foreground/80 sm:text-sm">
           {item.text}
         </span>
       </span>
@@ -1964,7 +1964,7 @@ function AnalysisPanel({
         <span className="text-lg sm:text-xl" aria-hidden>
           {glyph}
         </span>
-        <h3 className={`font-display text-lg uppercase tracking-tight sm:text-xl ${toneText}`}>{title}</h3>
+        <h3 className={`font-display text-lg uppercase tracking-[0.012em] sm:text-xl ${toneText}`}>{title}</h3>
       </div>
       {/* flex + justify-evenly spreads the 3 rows across the panel's full
           height with even breathing room above, between and below — instead
@@ -2271,7 +2271,7 @@ function WrappedCard({ index, card }: { index: number; card: WrappedCardData }) 
           {card.title}
         </h3>
       ) : null}
-      <p className="mt-1 text-[0.7rem] leading-snug text-muted-foreground transition-colors group-hover:text-foreground/80">
+      <p className="mt-1 text-[0.8125rem] leading-[1.5] text-muted-foreground transition-colors group-hover:text-foreground/80">
         {card.caption}
       </p>
     </div>
@@ -2360,7 +2360,7 @@ function Wrapped({ onNext, onPrev }: { onNext: () => void; onPrev: () => void })
         </Reveal>
 
         <Reveal delay={400} className="shrink-0 text-center">
-          <p className="font-display text-sm uppercase tracking-tight sm:text-base">
+          <p className="font-display text-sm uppercase tracking-[0.012em] sm:text-base">
             {c.outro.thanks}
           </p>
           <p className="mt-0.5 font-mono text-[0.7rem] tracking-[0.25em] text-accent sm:text-xs">
