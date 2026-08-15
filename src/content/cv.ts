@@ -341,9 +341,9 @@ export const content = {
     },
     brother: {
       relation: "MY BROTHER",
-      trait: "HELPING NATURE",
+      trait: "KINDNESS",
       quote:
-        "He's the first to show up when someone needs help, without ever making a big deal out of it. His instinct to help is something I genuinely admire.",
+        "He's the first to show up when someone needs help, without ever making a big deal out of it. His kind nature is something I genuinely admire.",
       photo: { label: "PHOTO — BROTHER", src: "" } as Photo,
     },
   },

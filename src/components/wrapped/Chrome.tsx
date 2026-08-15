@@ -50,20 +50,6 @@ export function ProgressRail({
   );
 }
 
-export function SoundToggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onToggle}
-      aria-pressed={on}
-      className="fixed left-6 top-6 z-40 flex items-center gap-2 rounded-full border border-border bg-card/80 px-3 py-2 font-mono text-[0.6rem] tracking-[0.25em] text-muted-foreground backdrop-blur transition-colors hover:border-accent hover:text-foreground"
-    >
-      <span className={on ? "text-accent" : ""}>{on ? "♪" : "×"}</span>
-      SOUND {on ? "ON" : "OFF"}
-    </button>
-  );
-}
-
 export function Loader({ done }: { done: boolean }) {
   return (
     <div

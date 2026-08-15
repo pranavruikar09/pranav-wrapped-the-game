@@ -5,8 +5,7 @@ import { FINAL_MOVE, MOVES, applyMove, positionAfter, type Piece } from "./chess
 import { ChapterLayout } from "./ChapterLayout";
 import { PhotoSlot } from "./PhotoSlot";
 import { ChapterTag, Reveal } from "./Reveal";
-import { Loader, ProgressRail, SoundToggle } from "./Chrome";
-import { playTick, setSoundEnabled } from "./sound";
+import { Loader, ProgressRail } from "./Chrome";
 
 type ChapterId =
   | "player"
@@ -56,7 +55,6 @@ type View =
 
 export function Story() {
   const [loaded, setLoaded] = useState(false);
-  const [sound, setSound] = useState(false);
   const [view, setView] = useState<View>({ kind: "intro" });
   const [movesPlayed, setMovesPlayed] = useState(0);
 
@@ -68,17 +66,7 @@ export function Story() {
   /** The persistent board position. Only advances once a move animation completes. */
   const pieces = useMemo(() => positionAfter(movesPlayed), [movesPlayed]);
 
-  const toggleSound = useCallback(() => {
-    setSound((s) => {
-      const next = !s;
-      setSoundEnabled(next);
-      if (next) playTick(440);
-      return next;
-    });
-  }, []);
-
   const start = useCallback(() => {
-    playTick(300);
     setView({ kind: "move", moveIndex: 0 });
   }, []);
 
@@ -130,7 +118,6 @@ export function Story() {
   return (
     <>
       <Loader done={loaded} />
-      <SoundToggle on={sound} onToggle={toggleSound} />
       {view.kind !== "intro" ? (
         <ProgressRail chapterIndex={progressIndex} labels={CHAPTER_LABELS} />
       ) : null}
@@ -261,7 +248,6 @@ function ChessMoveTransition({
   const handlePlay = useCallback(() => {
     setPlayed((already) => {
       if (already) return already;
-      playTick(360);
       window.setTimeout(() => {
         setLeaving(true);
         window.setTimeout(onComplete, 320);
@@ -908,7 +894,9 @@ function Player({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) 
       <ChapterLayout
         id="player"
         header={
-          // min-h below lg keeps the photo strip clear of the fixed SoundToggle.
+          // min-h below lg reserves the old top-left control's height. (That
+          // control was removed with the sound feature; the inset is kept so
+          // this chapter's spacing stays exactly as designed.)
           <Reveal className="flex min-h-11 justify-end lg:min-h-0">
             <p className="font-mono text-sm tracking-[0.35em] text-muted-foreground">
               01 / {c.chapter}
@@ -980,7 +968,7 @@ function Player({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) 
               the timeline itself. Columns land on roughly 18% / 65% / 17% of the
               content width, the split the design calls for. */}
           <div className="grid h-full min-h-0 grid-cols-1 gap-3 lg:grid-cols-[210px_minmax(0,1fr)_190px] lg:gap-x-7 lg:gap-y-3">
-            {/* left: memory rail — desktop/tablet only, starts below Sound Off */}
+            {/* left: memory rail — desktop/tablet only */}
             <Reveal delay={120} className="min-h-0">
               <OpeningPhotoRail photos={c.photos} />
             </Reveal>
@@ -1353,10 +1341,10 @@ function Passions({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }
       <ChapterLayout
         id="passions"
         header={
-          // The chapter tag only shows from lg up, where lg:pl-24 clears the fixed
-          // SoundToggle pinned top-left. Below lg there isn't room beside it, and
-          // the ProgressRail's mobile chip already names the chapter.
-          // min-h below lg keeps the title clear of the fixed SoundToggle.
+          // The chapter tag only shows from lg up; below lg the ProgressRail's
+          // mobile chip already names the chapter. The lg:pl-24 / min-h-11 inset
+          // originally cleared a fixed top-left control that has since been
+          // removed — kept so this chapter's spacing stays as designed.
           <div className="flex min-h-11 items-center justify-between gap-4 lg:min-h-0 lg:pl-24">
             <div className="hidden lg:block">
               <ChapterTag chapter={c.chapter} move="MOVE 02" />
@@ -1508,27 +1496,17 @@ function FamilyCard({
           : "border-border/80 bg-secondary/70 hover:border-accent/50"
       }`}
     >
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <span
-            className={`grid h-6 w-6 shrink-0 place-items-center rounded-full border p-1.5 text-accent transition-transform duration-300 group-hover:scale-110 ${
-              featured ? "border-accent/60" : "border-accent/30"
-            }`}
-          >
-            <FamilyIcon kind={icon} />
-          </span>
-          <span className="font-mono text-[0.65rem] tracking-[0.25em] text-muted-foreground">
-            {person.relation}
-          </span>
-        </div>
-        {/* small reserved corner frame — real photos drop straight in later
-            without touching layout; kept small so it stays an accent, not
-            the card's main event. */}
-        <PhotoSlot
-          photo={person.photo}
-          ratio="aspect-square"
-          className="w-11 shrink-0 overflow-hidden transition-transform duration-300 group-hover:scale-105"
-        />
+      <div className="flex items-center gap-2">
+        <span
+          className={`grid h-6 w-6 shrink-0 place-items-center rounded-full border p-1.5 text-accent transition-transform duration-300 group-hover:scale-110 ${
+            featured ? "border-accent/60" : "border-accent/30"
+          }`}
+        >
+          <FamilyIcon kind={icon} />
+        </span>
+        <span className="font-mono text-[0.65rem] tracking-[0.25em] text-muted-foreground">
+          {person.relation}
+        </span>
       </div>
 
       <h3
@@ -1667,8 +1645,9 @@ function Loreal({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) 
       <ChapterLayout
         id="loreal"
         header={
-          // Same lg:pl-24 clearance pattern as Blunder's header — keeps the
-          // "04 / 07" tag clear of the fixed SoundToggle pinned top-left.
+          // Same lg:pl-24 inset as Blunder's header (originally to clear a
+          // fixed top-left control, since removed) — kept for consistent
+          // spacing across chapters.
           <div className="flex min-h-11 items-center justify-between gap-4 lg:min-h-0 lg:pl-24">
             <Reveal className="hidden lg:block">
               <p className="font-mono text-sm tracking-[0.3em] text-accent">04 / 07</p>
@@ -2030,9 +2009,9 @@ function Blunder({ onNext, onPrev }: { onNext: () => void; onPrev: () => void })
       <ChapterLayout
         id="blunder"
         header={
-          // "05 / 07" only shows from lg, where lg:pl-24 clears the fixed
-          // SoundToggle pinned top-left — same treatment as Passions/Player.
-          // Below lg the ProgressRail's mobile chip already names the chapter.
+          // "05 / 07" only shows from lg, with the same lg:pl-24 inset as
+          // Passions/Player (originally to clear a fixed top-left control,
+          // since removed). Below lg the ProgressRail's chip names the chapter.
           <div className="flex min-h-11 items-center justify-between gap-4 lg:min-h-0 lg:pl-24">
             <Reveal className="hidden lg:block">
               <p className="font-mono text-sm tracking-[0.3em] text-accent">05 / 07</p>
