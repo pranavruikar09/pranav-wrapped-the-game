@@ -47,7 +47,7 @@ export const content = {
     portrait: { label: "ME", src: "/Photos/Raigad.jpeg", caption: "" } as Photo,
     /** Three small personal photos for the journey page. Add real files under /public and set `src`. */
     photos: [
-      { label: "PHOTO — SMALL-TOWN ROOTS", src: "/Photos/Village.jpeg", caption: "SMALL-TOWN ROOTS" },
+      { label: "PHOTO — SMALL-TOWN ROOTS", src: "/Photos/Village.jpeg", caption: "MY VILLAGE" },
       { label: "PHOTO — HOSTEL LIFE", src: "/Photos/Hostel.jpeg", caption: "HOSTEL LIFE" },
       { label: "PHOTO — A NEW CHAPTER", src: "/Photos/IIM_Mumbai_cropped.jpg", caption: "A NEW CHAPTER" },
     ] as Photo[],
@@ -271,6 +271,17 @@ export const content = {
       description: string;
       detail?: { label: string; value: string };
     }[],
+    /**
+     * A small photo strip, independent of the passion cards above — a
+     * separate sibling section, not one photo per card. Four snapshots, not
+     * one per passion.
+     */
+    gallery: [
+      { label: "FOOTBALL", src: "/Photos/Football.jpeg" },
+      { label: "CHESS", src: "/Photos/Chess.jpeg" },
+      { label: "DRONE", src: "/Photos/Drone.jpeg" },
+      { label: "ROBOCON", src: "/Photos/Robocon.jpeg" },
+    ] as Photo[],
   },
 
   /**
@@ -321,18 +332,21 @@ export const content = {
         title: "SCIENCE OVER NOISE",
         text: "I like understanding how things work. I tend to trust evidence, logic and first principles more than just having the loudest opinion.",
         icon: "flask",
+        image: "/Photos/Cerave1.jpeg",
       },
       {
         title: "RELIABILITY OVER RECOGNITION",
         text: "I value consistency and integrity. I'd rather be someone people can rely on than someone who constantly has to prove that I am.",
         icon: "shield",
+        image: "/Photos/Cerave2.jpeg",
       },
       {
         title: "SIMPLE OUTSIDE. THOUGHTFUL INSIDE.",
         text: "I like keeping things uncomplicated on the surface, while putting real thought into what sits underneath.",
         icon: "puzzle",
+        image: "/Photos/Cerave3.jpeg",
       },
-    ] as { title: string; text: string; icon: "flask" | "shield" | "puzzle" }[],
+    ] as { title: string; text: string; icon: "flask" | "shield" | "puzzle"; image: string }[],
     quote:
       "I may not always be the loudest voice, but I aim to be the person you can rely on when it really matters.",
     /** One small Wrapped-style stat — kept to a single data point on purpose. */
@@ -432,9 +446,9 @@ export const content = {
       {
         kind: "experience",
         label: "MOST UNDERRATED EXPERIENCE",
-        title: "A TREK TO RAJGAD FORT",
+        title: "A TREK TO KALUSUBAI PEAK",
         caption: "No deadlines. No notifications. Just a very long climb and a much better view.",
-        photo: { label: "PHOTO — RAJGAD FORT", src: "" } as Photo,
+        photo: { label: "PHOTO — KALUSUBAI PEAK", src: "" } as Photo,
       },
     ] as WrappedCard[],
     final: {

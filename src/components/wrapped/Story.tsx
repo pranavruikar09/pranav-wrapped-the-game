@@ -1117,6 +1117,33 @@ function PassionModal({ item, onClose }: { item: PassionItem; onClose: () => voi
   );
 }
 
+/**
+ * A small photo strip — a sibling of the passion-card grid, not a child of
+ * it. Fixed image height (not aspect-ratio) keeps its footprint small and
+ * predictable regardless of column width, since the card grid above it
+ * still owns most of the vertical budget.
+ */
+function PassionGallery({ photos }: { photos: Photo[] }) {
+  return (
+    <div className="grid shrink-0 grid-cols-4 gap-2 sm:gap-3">
+      {photos.map((photo) => (
+        <figure key={photo.label} className="group m-0">
+          <div className="h-14 w-full overflow-hidden rounded-lg border border-border/70 transition-colors duration-300 group-hover:border-accent/60 sm:h-16 lg:h-20">
+            <img
+              src={photo.src}
+              alt={photo.label}
+              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+          </div>
+          <figcaption className="mt-1 text-center font-mono text-[0.55rem] tracking-[0.2em] text-muted-foreground sm:text-[0.6rem]">
+            {photo.label}
+          </figcaption>
+        </figure>
+      ))}
+    </div>
+  );
+}
+
 function Passions({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) {
   const c = content.passions;
   const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -1203,6 +1230,11 @@ function Passions({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }
               </Reveal>
             ))}
           </div>
+
+          {/* Sibling of the card grid above, NOT nested inside any card. */}
+          <Reveal delay={480} className="shrink-0">
+            <PassionGallery photos={c.gallery} />
+          </Reveal>
         </div>
       </ChapterLayout>
 
@@ -1378,10 +1410,12 @@ function Beauty({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) 
 function TraitMatchCard({
   item,
   index,
+  image,
   onOpen,
 }: {
   item: AnalysisItem;
   index: number;
+  image: string;
   onOpen: () => void;
 }) {
   return (
@@ -1403,6 +1437,16 @@ function TraitMatchCard({
       <p className="mt-1 line-clamp-3 text-[0.72rem] leading-snug text-muted-foreground transition-colors group-hover:text-foreground/80 sm:line-clamp-none sm:text-[0.8rem]">
         {item.text}
       </p>
+      {/* Fixed height (not aspect-ratio) so the image's contribution to the
+          card's total height is predictable and small — the point of this
+          change is to reduce empty space, not add more. */}
+      <div className="mt-2 h-20 w-full shrink-0 overflow-hidden rounded-lg border border-border/70 sm:h-24">
+        <img
+          src={image}
+          alt={item.title}
+          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+        />
+      </div>
       <span
         className="mt-auto pt-1.5 font-mono text-[0.65rem] uppercase tracking-[0.2em] text-accent opacity-60 transition-opacity group-hover:opacity-100"
         aria-hidden
@@ -1453,8 +1497,11 @@ function Loreal({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) 
           </Reveal>
         }
       >
-        {/* lg:pr-* keeps content clear of the fixed chapter rail, matching Blunder. */}
-        <div className="mx-auto flex h-full min-h-0 w-full max-w-6xl flex-col gap-2 sm:gap-3 lg:pr-32">
+        {/* lg:pr-* keeps content clear of the fixed chapter rail, matching Blunder.
+            justify-center groups hero + cards + quote and centres them as one
+            block — the cards size to their own content instead of the grid
+            forcing itself to fill the chapter (same fix as the Beauty page). */}
+        <div className="mx-auto flex h-full min-h-0 w-full max-w-6xl flex-col justify-center gap-2 sm:gap-3 lg:pr-32">
           <div className="shrink-0 text-center">
             <Reveal>
               <p className="font-mono text-[0.65rem] tracking-[0.3em] text-muted-foreground sm:text-xs">
@@ -1483,10 +1530,10 @@ function Loreal({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) 
             </Reveal>
           </div>
 
-          <div className="grid min-h-0 flex-1 grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-3">
+          <div className="grid shrink-0 grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-3">
             {c.traits.map((item, i) => (
-              <Reveal key={item.title} delay={200 + i * 60} className="min-h-0">
-                <TraitMatchCard item={item} index={i} onOpen={() => setOpenIndex(i)} />
+              <Reveal key={item.title} delay={200 + i * 60} className="h-full">
+                <TraitMatchCard item={item} index={i} image={item.image} onOpen={() => setOpenIndex(i)} />
               </Reveal>
             ))}
           </div>
