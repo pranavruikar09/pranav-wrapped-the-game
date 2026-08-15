@@ -41,10 +41,25 @@ export const content = {
     chapter: "OPENING",
     title: "HOW DID I GET HERE?",
     subtitle: "A small-town start, a lot of moving around, and a few unexpected turns.",
-    /** Write this the way you'd say it out loud, not the way you'd write it on LinkedIn. */
-    voice:
-      "[SHORT INTRO IN YOUR OWN VOICE — 3 or 4 sentences. Who you are on an ordinary Tuesday, not on a CV. What you're curious about. What you're bad at pretending to care about.]",
     portrait: { label: "ME", src: "/Photos/Raigad.jpeg", caption: "" } as Photo,
+    /**
+     * The right-hand profile card: who the person behind the timeline is.
+     * Deliberately short — the Journey tells the story, this just gives a
+     * recruiter the human context in about five seconds.
+     */
+    profile: {
+      nameAge: "PRANAV / 25",
+      headline: "ENGINEER → MBA → STILL LOADING...",
+      story: [
+        "Started in a small town in Maharashtra. Moved around, built things, led teams, and made a few wrong turns.",
+        "From school leadership to engineering at Lear, and now to IIM Mumbai — the route wasn't exactly planned, but every stop added something.",
+      ],
+      facts: [
+        { label: "BASED IN", value: "MUMBAI" },
+        { label: "BACKGROUND", value: "E&TC ENGINEER" },
+        { label: "CURRENTLY", value: "MBA · IIM MUMBAI" },
+      ],
+    },
     /** The left photo rail on the journey page — a visual scrapbook that runs
      *  alongside the timeline. Page-level content: these are NOT tied to any
      *  journey node. Add real files under /public/Photos and set `src`. */

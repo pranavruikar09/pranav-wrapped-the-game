@@ -418,16 +418,15 @@ const JOURNEY_LAYOUT: { x: number; y: number }[] = [
 ];
 /** The lower-left of the timeline box is deliberately left empty by the layout
  *  above — JourneyLegend is overlaid there (see Player). */
-/** Indices, in path order, that form the main route. Sub/blunder entries branch off it instead. */
-const JOURNEY_MAIN_PATH = [0, 1, 2, 5, 7, 10, 12];
-/** [parentIndex, childIndex] — every non-main-path node branches off one neighbour. */
+/**
+ * The chronological spine, in order. Every milestone sits on it so the eye can
+ * follow 2001 → 2026 as one continuous path; only the two setbacks branch off.
+ */
+const JOURNEY_MAIN_PATH = [0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 12];
+/** [spineIndex, setbackIndex] — the detours that hang off the main route. */
 const JOURNEY_BRANCHES: [number, number][] = [
-  [2, 3],
-  [3, 4],
-  [5, 6],
-  [7, 8],
-  [8, 9],
-  [10, 11],
+  [5, 6], // 2015 Pune → JEE
+  [10, 11], // 2024 Pune → CAT
 ];
 /** Which edges (as "a-b" keys) should highlight for the currently-hovered
  *  node — nothing highlights when nothing is hovered. */
@@ -582,17 +581,14 @@ function Journey({
 }) {
   const highlighted = useMemo(() => activeEdgeKeys(hovered), [hovered]);
 
-  const edges: { a: number; b: number; kind: "blunder" | "sub" | "main" }[] = [
-    ...JOURNEY_MAIN_PATH.slice(0, -1).map((a, i) => ({
-      a,
-      b: JOURNEY_MAIN_PATH[i + 1]!,
-      kind: "main" as const,
-    })),
-    ...JOURNEY_BRANCHES.map(([a, b]) => ({
-      a,
-      b,
-      kind: entries[b]!.kind === "blunder" ? ("blunder" as const) : ("sub" as const),
-    })),
+  // "current" = the final hop into today's position; it carries the accent so
+  // the eye lands on where the journey stands now.
+  const edges: { a: number; b: number; kind: "blunder" | "current" | "main" }[] = [
+    ...JOURNEY_MAIN_PATH.slice(0, -1).map((a, i) => {
+      const b = JOURNEY_MAIN_PATH[i + 1]!;
+      return { a, b, kind: entries[b]!.kind === "current" ? ("current" as const) : ("main" as const) };
+    }),
+    ...JOURNEY_BRANCHES.map(([a, b]) => ({ a, b, kind: "blunder" as const })),
   ];
 
   return (
@@ -603,10 +599,21 @@ function Journey({
         className="absolute inset-0 h-full w-full"
         aria-hidden
       >
+        {/* Connections are always drawn — hover only strengthens them, it never
+            reveals them. Widths are in real px (non-scaling-stroke), so these
+            need to be ~1.5, not the sub-pixel values a 0-100 viewBox suggests. */}
         {edges.map(({ a, b, kind }) => {
           const p1 = JOURNEY_LAYOUT[a]!;
           const p2 = JOURNEY_LAYOUT[b]!;
           const isHot = highlighted.has(`${a}-${b}`);
+          const stroke =
+            kind === "blunder"
+              ? "var(--color-destructive)"
+              : kind === "current"
+                ? "var(--color-accent)"
+                : "var(--color-muted-foreground)";
+          const baseOpacity = kind === "current" ? 0.9 : kind === "blunder" ? 0.7 : 0.45;
+          const baseWidth = kind === "current" ? 2 : kind === "blunder" ? 1.4 : 1.5;
           return (
             <line
               key={`${a}-${b}`}
@@ -614,18 +621,10 @@ function Journey({
               y1={p1.y}
               x2={p2.x}
               y2={p2.y}
-              stroke={
-                isHot
-                  ? kind === "blunder"
-                    ? "var(--color-destructive)"
-                    : "var(--color-accent)"
-                  : kind === "blunder"
-                    ? "var(--color-destructive)"
-                    : "var(--color-border)"
-              }
-              strokeOpacity={isHot ? 1 : kind === "main" ? 0.8 : 0.55}
-              strokeWidth={isHot ? 0.7 : 0.45}
-              strokeDasharray={kind === "main" ? undefined : "2,2"}
+              stroke={isHot && kind === "main" ? "var(--color-accent)" : stroke}
+              strokeOpacity={isHot ? 1 : baseOpacity}
+              strokeWidth={isHot ? baseWidth + 0.8 : baseWidth}
+              strokeDasharray={kind === "blunder" ? "3,3" : undefined}
               strokeLinecap="round"
               vectorEffect="non-scaling-stroke"
               className="transition-all duration-300"
@@ -740,7 +739,7 @@ function OpeningPhotoRail({ photos }: { photos: Photo[] }) {
     // aspect ratio, so the strip stays exactly one viewport tall no matter how
     // many photos the content file lists. object-cover (in PhotoSlot) keeps
     // them undistorted as the derived aspect changes.
-    <div className="hidden h-full min-h-0 min-w-0 lg:flex lg:flex-col lg:gap-2">
+    <div className="flex h-full min-h-0 min-w-0 flex-col gap-2">
       {photos.map((p, i) => (
         <PhotoSlot
           key={i}
@@ -786,13 +785,64 @@ function JourneyLegend() {
   );
 }
 
-function OpeningPortrait({ portrait, tag }: { portrait: Photo; tag: string }) {
+/**
+ * Portrait + who-I-am, as ONE card: a single border and background wrap both
+ * halves, so the photo reads as the top of the card rather than a separate
+ * tile sitting above a text box.
+ *
+ * The image uses object-contain and takes its height from its own aspect
+ * ratio — never object-cover. The card column is much taller than it is wide,
+ * so cover would scale the photo up to fill that height and then clip the
+ * sides, cutting people out of the frame. Contain guarantees the whole
+ * original image is visible at full width; max-h only ever scales it down
+ * uniformly, it never crops.
+ */
+function OpeningProfileCard({
+  portrait,
+  profile,
+}: {
+  portrait: Photo;
+  profile: typeof content.intro.profile;
+}) {
   return (
-    <div className="hidden min-w-0 lg:block">
-      <PhotoSlot photo={portrait} />
-      <p className="mt-2 text-center font-mono text-sm tracking-[0.25em] text-muted-foreground">
-        {tag}
-      </p>
+    <div className="hidden min-w-0 flex-col overflow-hidden rounded-2xl border border-border/80 bg-secondary/60 lg:flex">
+      <div className="shrink-0 border-b border-border/70 bg-background/40">
+        <img
+          src={portrait.src}
+          alt={portrait.label}
+          className="max-h-[32vh] w-full object-contain"
+        />
+      </div>
+
+      <div className="shrink-0 p-3">
+        <p className="font-mono text-[0.6rem] tracking-[0.25em] text-muted-foreground">
+          {profile.nameAge}
+        </p>
+        <p className="mt-1 font-display text-sm uppercase leading-tight text-accent xl:text-base">
+          {profile.headline}
+        </p>
+
+        <div className="mt-2 space-y-1.5">
+          {profile.story.map((line) => (
+            <p key={line} className="text-[0.68rem] leading-snug text-foreground/75">
+              {line}
+            </p>
+          ))}
+        </div>
+
+        <dl className="mt-2.5 space-y-1 border-t border-border/70 pt-2">
+          {profile.facts.map((f) => (
+            <div key={f.label} className="flex items-baseline justify-between gap-2">
+              <dt className="font-mono text-[0.55rem] tracking-[0.18em] text-muted-foreground">
+                {f.label}
+              </dt>
+              <dd className="text-right font-mono text-[0.6rem] uppercase leading-tight text-foreground/90">
+                {f.value}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </div>
     </div>
   );
 }
@@ -963,32 +1013,34 @@ function Player({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) 
             containers, needed here for the same reason: at ~1366px wide the
             rail sits at ~1212px and unpadded content runs edge-to-edge. */}
         <div className="mx-auto h-full min-h-0 w-full max-w-7xl lg:pr-32">
-          {/* Page-level 3-region layout: OpeningPhotoRail | journey column | OpeningPortrait.
+          {/* Page-level 3-region layout: OpeningPhotoRail | journey column | profile card.
               These are grid SIBLINGS, not children of Journey — Journey only ever draws
-              the timeline itself. Columns land on roughly 18% / 65% / 17% of the
-              content width, the split the design calls for. */}
-          <div className="grid h-full min-h-0 grid-cols-1 gap-3 lg:grid-cols-[210px_minmax(0,1fr)_190px] lg:gap-x-7 lg:gap-y-3">
-            {/* left: memory rail — desktop/tablet only */}
-            <Reveal delay={120} className="min-h-0">
+              the timeline itself.
+
+              Full three-column split only from xl. Between lg and xl the left rail is
+              hidden (its photos fall back to the strip above the heading), because at
+              those widths three columns squeeze the timeline narrow enough that the
+              node labels collide with each other. */}
+          <div className="grid h-full min-h-0 grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_250px] lg:gap-x-7 lg:gap-y-3 xl:grid-cols-[210px_minmax(0,1fr)_250px]">
+            {/* left: memory rail — xl and up (see grid comment above) */}
+            <Reveal delay={120} className="hidden min-h-0 xl:block">
               <OpeningPhotoRail photos={c.photos} />
             </Reveal>
 
             {/* centre: heading + journey, unchanged in size/position */}
             <div className="flex min-h-0 min-w-0 flex-col gap-2">
               <div className="shrink-0">
-                {/* compact mobile photo strip — the memory rail becomes a small row here,
-                    since the 3-column layout doesn't fit below `lg`. */}
-                <div className="mb-2 flex gap-2 lg:hidden">
+                {/* Compact stand-in for the memory rail, shown wherever the rail's
+                    own column isn't (below xl). The portrait chip drops out at lg,
+                    where the profile card takes over showing it — so the portrait
+                    is never on screen twice. */}
+                <div className="mb-2 flex gap-2 xl:hidden">
                   {c.photos.map((p, i) => (
                     <div key={i} className="w-11 shrink-0">
                       <PhotoSlot photo={{ label: p.label, src: p.src ?? "" }} ratio="aspect-square" />
                     </div>
                   ))}
-                  {/* Portrait's own rail is desktop/tablet-only (see OpeningPortrait) —
-                      below lg it joins this same page-level strip instead of being
-                      anchored inside Journey, so photos stay Journey's siblings on
-                      every breakpoint, not just desktop. */}
-                  <div className="w-11 shrink-0">
+                  <div className="w-11 shrink-0 lg:hidden">
                     <PhotoSlot photo={{ label: c.portrait.label, src: c.portrait.src ?? "" }} ratio="aspect-square" />
                   </div>
                 </div>
@@ -1028,9 +1080,9 @@ function Player({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) 
               </div>
             </div>
 
-            {/* right: portrait — desktop/tablet only, top-aligned below "01 / OPENING" */}
-            <Reveal delay={140} className="lg:pt-1">
-              <OpeningPortrait portrait={c.portrait} tag={`${content.name} / 01`} />
+            {/* right: unified profile card — a sibling of Journey, never inside it */}
+            <Reveal delay={140} className="min-h-0">
+              <OpeningProfileCard portrait={c.portrait} profile={c.profile} />
             </Reveal>
           </div>
         </div>
