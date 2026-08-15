@@ -42,6 +42,9 @@ const CHAPTER_LABELS = [
  *  viewport axes so it can never push surrounding text out of the viewport. */
 const BOARD_SIZE_LG = "min(40dvh, 44vw, 19rem)";
 const BOARD_SIZE_SM = "min(34dvh, 40vw, 15rem)";
+/** The Endgame board — a major visual anchor, larger than BOARD_SIZE_LG, but
+ *  still bounded on both axes so the bottom closing section always fits. */
+const BOARD_SIZE_ENDGAME = "min(46dvh, 30vw, 24rem)";
 /** The chess move transition is the board's big moment — noticeably larger than
  * elsewhere, still bounded by both axes so it never forces a scrollbar. */
 const BOARD_SIZE_TRANSITION = "min(58dvh, 46vw, 40rem)";
@@ -356,13 +359,17 @@ function PrevMoveButton({
   );
 }
 
-/** Shared call-to-action used in the footer of every non-final chapter. */
+/** Shared call-to-action used in the footer of every non-final chapter —
+ *  and, with an overridden label, as the Endgame page's single primary
+ *  "Play again" action, so there's exactly one pill-button style site-wide. */
 function NextMoveButton({
   onClick,
   tone = "dark",
+  label = "Next move →",
 }: {
   onClick: () => void;
   tone?: MoveNavTone;
+  label?: string;
 }) {
   return (
     <button
@@ -374,7 +381,7 @@ function NextMoveButton({
           : "bg-accent text-accent-foreground"
       }`}
     >
-      Next move →
+      {label}
     </button>
   );
 }
@@ -2147,79 +2154,90 @@ function Endgame({
   return (
     <ChapterLayout
       id="endgame"
-      header={<ChapterTag chapter={c.chapter} move="MOVE 07" />}
-      footer={
-        <Reveal delay={100} className="flex items-center justify-between gap-3">
-          <PrevMoveButton onClick={onPrev} />
-
-          <div className="flex flex-1 flex-col items-center gap-1">
-            <button
-              type="button"
-              onClick={onReplay}
-              className="rounded-full border border-border px-6 py-2 font-mono text-sm tracking-[0.25em] text-muted-foreground transition-colors hover:border-accent hover:text-foreground"
-            >
-              ↻ PLAY AGAIN
-            </button>
-            <p className="hidden font-mono text-sm tracking-[0.2em] text-muted-foreground/60 sm:block">
-              {content.subtitle}
+      header={
+        // Same lg:pl-24 clearance pattern as Blunder/Loreal/Wrapped's headers.
+        <div className="flex min-h-11 items-center justify-between gap-4 lg:min-h-0 lg:pl-24">
+          <Reveal className="hidden lg:block">
+            <p className="font-mono text-sm tracking-[0.3em] text-accent">07 / 07</p>
+          </Reveal>
+          <Reveal className="ml-auto">
+            <p className="flex items-center gap-2 font-mono text-sm tracking-[0.3em] text-muted-foreground">
+              {c.chapter}
+              <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-accent" aria-hidden />
             </p>
+          </Reveal>
+        </div>
+      }
+      footer={
+        <Reveal delay={100} className="flex flex-col items-center gap-2">
+          <div className="flex w-full items-center justify-between gap-3">
+            <PrevMoveButton onClick={onPrev} />
+            <NextMoveButton onClick={onReplay} label="Play again →" />
           </div>
+          <p className="font-mono text-[0.65rem] tracking-[0.25em] text-muted-foreground/60">
+            {content.name} WRAPPED · {content.year}
+          </p>
         </Reveal>
       }
     >
-      <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-        <Reveal className="mx-auto lg:mx-0">
-          <Chessboard pieces={pieces} size={BOARD_SIZE_SM} />
-          <p className="mt-2 text-center font-mono text-sm tracking-[0.2em] text-muted-foreground lg:text-left">
-            SAME BOARD. DIFFERENT POSITION.
-          </p>
-        </Reveal>
-
-        <div>
-          <Reveal>
-            <h2 className="font-display text-[clamp(1.75rem,6vw,3.5rem)] uppercase leading-[0.86]">
-              {c.title}
-            </h2>
-          </Reveal>
-          <div className="mt-2 space-y-0.5">
-            {c.lines.map((l, i) => (
-              <Reveal key={l} delay={i * 60}>
-                <p className="font-display text-base uppercase text-muted-foreground sm:text-lg">
-                  {l}
-                </p>
-              </Reveal>
-            ))}
-          </div>
-
-          <Reveal delay={140} className="hidden sm:block">
-            <div className="mt-3 rounded-xl border border-border bg-card p-3">
-              <div className="font-mono text-sm tracking-[0.2em] text-accent">GAME STATUS</div>
-              <dl className="mt-2 divide-y divide-border">
-                {c.status.map((s) => (
-                  <div key={s.label} className="flex items-baseline justify-between gap-4 py-1.5">
-                    <dt className="font-mono text-sm tracking-[0.15em] text-muted-foreground">
-                      {s.label.toUpperCase()}
-                    </dt>
-                    <dd className="font-display text-base uppercase">{s.value}</dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
-          </Reveal>
-        </div>
-      </div>
-
-      <div className="mt-4 text-center">
-        {c.final.map((l, i) => (
-          <Reveal key={l} delay={i * 100}>
-            <p className="mx-auto max-w-2xl font-display text-lg uppercase leading-tight sm:text-2xl">
-              {l}
+      {/* lg:pr-* keeps content clear of the fixed chapter rail, matching every
+          other chapter. justify-center groups the hero row + closing block
+          and centres them as one block within the available height. */}
+      <div className="mx-auto flex h-full min-h-0 w-full max-w-6xl flex-col justify-center gap-5 lg:pr-32">
+        <div className="grid shrink-0 gap-6 lg:grid-cols-[auto_1fr] lg:items-center lg:gap-10">
+          <Reveal className="mx-auto lg:mx-0">
+            <Chessboard pieces={pieces} size={BOARD_SIZE_ENDGAME} />
+            <p className="mt-3 text-center font-mono text-sm tracking-[0.2em] text-muted-foreground lg:text-left">
+              SAME BOARD. DIFFERENT <span className="text-accent">POSITION.</span>
             </p>
           </Reveal>
-        ))}
-        <Reveal delay={200}>
-          <p className="mt-3 font-mono text-sm tracking-[0.3em] text-accent">{c.signoff}</p>
-        </Reveal>
+
+          <div className="min-w-0 text-center lg:text-left">
+            <Reveal>
+              <h2 className="font-display text-[clamp(2rem,6vw,4rem)] uppercase leading-[0.86]">
+                THE GAME <span className="text-accent">ISN&apos;T OVER.</span>
+              </h2>
+            </Reveal>
+            <div className="mt-2 space-y-0.5">
+              {c.lines.map((l, i) => (
+                <Reveal key={l} delay={i * 60}>
+                  <p className="font-display text-base text-muted-foreground sm:text-lg">{l}</p>
+                </Reveal>
+              ))}
+            </div>
+
+            <Reveal delay={140} className="hidden sm:block">
+              <div className="mx-auto mt-3 max-w-sm rounded-xl border border-border bg-card/60 px-4 py-3 lg:mx-0">
+                <p className="font-mono text-xs tracking-[0.25em] text-accent">GAME STATUS</p>
+                <dl className="mt-1.5 divide-y divide-border/70">
+                  {c.status.map((s) => (
+                    <div key={s.label} className="flex items-baseline justify-between gap-4 py-1.5">
+                      <dt className="font-mono text-xs tracking-[0.1em] text-muted-foreground">
+                        {s.label.toUpperCase()}
+                      </dt>
+                      <dd className="font-display text-sm uppercase text-foreground">{s.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            </Reveal>
+          </div>
+        </div>
+
+        <div className="shrink-0 text-center">
+          {c.final.map((l, i) => (
+            <Reveal key={l} delay={i * 100}>
+              <p className="mx-auto max-w-3xl font-display text-xl uppercase leading-tight sm:text-3xl">
+                {l}
+              </p>
+            </Reveal>
+          ))}
+          <Reveal delay={220}>
+            <p className="mt-2 font-mono text-xs tracking-[0.3em] text-accent sm:text-sm">
+              {c.signoff}
+            </p>
+          </Reveal>
+        </div>
       </div>
     </ChapterLayout>
   );

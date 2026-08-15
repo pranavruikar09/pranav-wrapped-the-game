@@ -462,12 +462,12 @@ export const content = {
 
   endgame: {
     chapter: "ENDGAME",
-    title: "THE NEXT MOVE",
+    /** Sentence case on purpose — rendered without the uppercase treatment
+     *  the rest of the site uses, matching the reference's reflective tone. */
     lines: [
-      "25 YEARS IN.",
-      "A FEW GOOD MOVES.",
-      "A FEW TERRIBLE ONES.",
-      "SEVERAL POSITIONS I STILL DON'T UNDERSTAND.",
+      "25 years in.",
+      "A few good moves. A few questionable ones.",
+      "Still figuring out the position.",
     ],
     status: [
       { label: "Opening", value: "Complete" },
