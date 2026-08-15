@@ -436,18 +436,119 @@ const JOURNEY_BRANCHES: [number, number][] = [
   [8, 9],
   [10, 11],
 ];
-/** For a given active node, which edges (as "a-b" keys) should highlight. */
-function activeEdgeKeys(active: number): Set<string> {
+/** Which edges (as "a-b" keys) should highlight for the currently-hovered
+ *  node — nothing highlights when nothing is hovered. */
+function activeEdgeKeys(hovered: number | null): Set<string> {
   const keys = new Set<string>();
-  const mainPos = JOURNEY_MAIN_PATH.indexOf(active);
+  if (hovered === null) return keys;
+  const mainPos = JOURNEY_MAIN_PATH.indexOf(hovered);
   if (mainPos !== -1) {
-    if (mainPos > 0) keys.add(`${JOURNEY_MAIN_PATH[mainPos - 1]}-${active}`);
-    if (mainPos < JOURNEY_MAIN_PATH.length - 1) keys.add(`${active}-${JOURNEY_MAIN_PATH[mainPos + 1]}`);
+    if (mainPos > 0) keys.add(`${JOURNEY_MAIN_PATH[mainPos - 1]}-${hovered}`);
+    if (mainPos < JOURNEY_MAIN_PATH.length - 1) keys.add(`${hovered}-${JOURNEY_MAIN_PATH[mainPos + 1]}`);
   }
   for (const [a, b] of JOURNEY_BRANCHES) {
-    if (a === active || b === active) keys.add(`${a}-${b}`);
+    if (a === hovered || b === hovered) keys.add(`${a}-${b}`);
   }
   return keys;
+}
+
+type JourneyIconKind = JourneyEntry["icon"];
+
+/** Small line-art icon per journey milestone — same technical pattern as
+ *  AnalysisIcon/PassionIcon/FamilyIcon (24x24, thin stroke, currentColor). */
+function JourneyIcon({ kind }: { kind: JourneyIconKind }) {
+  const common = {
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.7,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+    className: "h-full w-full",
+  };
+  switch (kind) {
+    case "home":
+      return (
+        <svg {...common} aria-hidden>
+          <path d="M4 11 12 4l8 7" />
+          <path d="M6 10v9h5v-5h2v5h5v-9" />
+        </svg>
+      );
+    case "hostel":
+      return (
+        <svg {...common} aria-hidden>
+          <path d="M3 19v-6a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v2h8a2 2 0 0 1 2 2v4" />
+          <path d="M3 19h18M3 19v1.5M21 21v-2" />
+          <circle cx="6.5" cy="9.5" r="1.3" />
+        </svg>
+      );
+    case "shield":
+      return (
+        <svg {...common} aria-hidden>
+          <path d="M12 3.5 19 6v6c0 4.5-3 7.7-7 8.5-4-.8-7-4-7-8.5V6l7-2.5Z" />
+          <path d="m9 12 2 2 4-4.2" />
+        </svg>
+      );
+    case "crown":
+      return (
+        <svg {...common} aria-hidden>
+          <path d="M4 9l3.2 2.6L12 5l4.8 6.6L20 9l-1.6 9H5.6L4 9Z" />
+          <path d="M6 20.5h12" />
+        </svg>
+      );
+    case "book":
+      return (
+        <svg {...common} aria-hidden>
+          <path d="M12 6.5C10.4 5.2 8.2 4.6 4.5 4.6v13c3.7 0 5.9.6 7.5 1.9 1.6-1.3 3.8-1.9 7.5-1.9v-13c-3.7 0-5.9.6-7.5 1.9Z" />
+          <path d="M12 6.5v13" />
+        </svg>
+      );
+    case "x":
+      return (
+        <svg {...common} aria-hidden>
+          <path d="M6.5 6.5l11 11M17.5 6.5l-11 11" />
+        </svg>
+      );
+    case "circuit":
+      return (
+        <svg {...common} aria-hidden>
+          <circle cx="6" cy="7" r="1.8" />
+          <circle cx="18" cy="17" r="1.8" />
+          <path d="M6 8.8V13a2 2 0 0 0 2 2h8.2" />
+        </svg>
+      );
+    case "robot":
+      return (
+        <svg {...common} aria-hidden>
+          <rect x="5.5" y="9" width="13" height="9.5" rx="2" />
+          <path d="M12 5.5v3.5" />
+          <circle cx="12" cy="4.5" r="1" fill="currentColor" stroke="none" />
+          <path d="M9 13.2h.01M15 13.2h.01M9.5 16.3h5" />
+        </svg>
+      );
+    case "trophy":
+      return (
+        <svg {...common} aria-hidden>
+          <path d="M8 4h8v4.2a4 4 0 0 1-8 0V4Z" />
+          <path d="M8 5.2H5.3a2.8 2.8 0 0 0 2.8 4.6M16 5.2h2.7a2.8 2.8 0 0 1-2.8 4.6" />
+          <path d="M10.3 13.8V17h3.4v-3.2M8.3 20h7.4" />
+        </svg>
+      );
+    case "briefcase":
+      return (
+        <svg {...common} aria-hidden>
+          <rect x="3.2" y="8" width="17.6" height="11" rx="2" />
+          <path d="M8.3 8V6.3a2 2 0 0 1 2-2h3.4a2 2 0 0 1 2 2V8M3.2 13h17.6" />
+        </svg>
+      );
+    case "graduation":
+      return (
+        <svg {...common} aria-hidden>
+          <path d="M12 4.5 2.5 9l9.5 4.5L21.5 9 12 4.5Z" />
+          <path d="M6.5 11.3v3.9c0 1.4 2.6 2.8 5.5 2.8s5.5-1.4 5.5-2.8v-3.9" />
+        </svg>
+      );
+  }
 }
 
 /**
@@ -471,17 +572,22 @@ function panelStyle(pos: { x: number; y: number }): CSSProperties {
 
 function Journey({
   entries,
-  active,
-  onSelect,
+  hovered,
+  onEnter,
+  onLeave,
+  onToggle,
 }: {
   entries: JourneyEntry[];
-  active: number;
-  onSelect: (i: number) => void;
+  /** Node index the info card is currently shown for, or null when nothing
+   *  is hovered/tapped — the default, clean resting state. */
+  hovered: number | null;
+  onEnter: (i: number) => void;
+  onLeave: (i: number) => void;
+  /** Click/tap — the secondary interaction for touch devices, where hover
+   *  doesn't exist. Toggles the card open/closed on the tapped node. */
+  onToggle: (i: number) => void;
 }) {
-  const c = content.intro;
-  const milestone = entries[active]!;
-  const activePos = JOURNEY_LAYOUT[active]!;
-  const highlighted = useMemo(() => activeEdgeKeys(active), [active]);
+  const highlighted = useMemo(() => activeEdgeKeys(hovered), [hovered]);
 
   const edges: { a: number; b: number; kind: "blunder" | "sub" | "main" }[] = [
     ...JOURNEY_MAIN_PATH.slice(0, -1).map((a, i) => ({
@@ -537,45 +643,58 @@ function Journey({
 
       {entries.map((entry, i) => {
         const pos = JOURNEY_LAYOUT[i]!;
-        const isActive = i === active;
+        const isHovered = i === hovered;
         const isBlunder = entry.kind === "blunder";
         const isCurrent = entry.kind === "current";
         const isSub = entry.kind === "sub";
+
+        const markerSize = isCurrent
+          ? "h-7 w-7 sm:h-8 sm:w-8"
+          : isSub
+            ? "h-5 w-5 sm:h-6 sm:w-6"
+            : "h-6 w-6 sm:h-7 sm:w-7";
+        const markerTone = isBlunder
+          ? isHovered
+            ? "border-destructive bg-background text-destructive ring-2 ring-destructive/50"
+            : "border-destructive/60 bg-background text-destructive/80"
+          : isCurrent
+            ? "border-accent bg-accent text-accent-foreground shadow-[0_0_16px_-3px_var(--accent)]"
+            : isHovered
+              ? "border-accent bg-background text-foreground ring-2 ring-accent/50"
+              : "border-foreground/35 bg-background text-muted-foreground/80";
+
         return (
           <button
             key={`${entry.year}-${entry.location}-${entry.label}`}
             type="button"
-            onClick={() => onSelect(i)}
-            onMouseEnter={() => onSelect(i)}
-            aria-pressed={isActive}
+            onClick={() => onToggle(i)}
+            onMouseEnter={() => onEnter(i)}
+            onMouseLeave={() => onLeave(i)}
+            onFocus={() => onEnter(i)}
+            onBlur={() => onLeave(i)}
+            aria-expanded={isHovered}
             aria-label={`${entry.year} — ${entry.location}: ${entry.label}`}
             style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
-            className={`absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-0.5 text-center transition-transform ${
-              isActive ? "z-10 scale-[1.15]" : isSub || isBlunder ? "opacity-80 hover:scale-105" : "hover:scale-105"
-            } ${!isActive ? "opacity-90" : ""}`}
+            className={`absolute flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-0.5 text-center transition-transform focus-visible:outline-none ${
+              isHovered ? "z-10 scale-[1.15]" : "hover:scale-105"
+            } ${isSub && !isHovered ? "opacity-85" : ""}`}
           >
             <span
               aria-hidden
-              className={`grid place-items-center rounded-full border transition-colors ${
-                isBlunder
-                  ? "h-3 w-3 border-destructive bg-background text-destructive"
-                  : isCurrent
-                    ? "h-3.5 w-3.5 border-accent bg-accent"
-                    : "h-2.5 w-2.5 border-foreground/50 bg-background"
-              } ${isActive ? "ring-2 ring-accent/70" : ""}`}
+              className={`grid shrink-0 place-items-center rounded-full border p-1 transition-all duration-200 ${markerSize} ${markerTone}`}
             >
-              {isBlunder ? <span className="text-[0.45rem] leading-none">✕</span> : null}
+              <JourneyIcon kind={entry.icon} />
             </span>
             <span
-              className={`font-mono text-[clamp(0.8125rem,1vw,1rem)] leading-tight ${
-                isActive ? "text-accent" : "text-muted-foreground"
+              className={`font-mono text-[clamp(0.75rem,0.95vw,0.9375rem)] leading-tight ${
+                isHovered || isCurrent ? "text-accent" : isBlunder ? "text-destructive/80" : "text-muted-foreground"
               }`}
             >
               {entry.year}
             </span>
             <span
-              className={`font-display text-[clamp(1rem,1.3vw,1.25rem)] uppercase leading-tight ${
-                isActive ? "text-foreground" : "text-foreground/70"
+              className={`font-display text-[clamp(0.9375rem,1.25vw,1.1875rem)] uppercase leading-tight ${
+                isHovered ? "text-foreground" : "text-foreground/70"
               }`}
             >
               {entry.location}
@@ -584,34 +703,33 @@ function Journey({
         );
       })}
 
-      {/* current-position photo, anchored near Mumbai — mobile/tablet only; desktop shows the
-          portrait in its own column instead (see Player). */}
-      <div
-        style={{ left: `${JOURNEY_LAYOUT[12]!.x}%`, top: "94%" }}
-        className="absolute w-14 -translate-x-1/2 -translate-y-1/2 sm:w-16 lg:hidden"
-      >
-        <PhotoSlot photo={{ label: c.portrait.label, src: c.portrait.src ?? "" }} />
-      </div>
-
-      {/* floating detail panel — spatially anchored to the active node, never at the bottom.
-          Keyed by `active` so it fully remounts (not just re-styles) on selection change. */}
-      <div
-        key={active}
-        style={panelStyle(activePos)}
-        className="absolute z-20 w-44 max-w-[calc(100vw-2rem)] animate-fade-in rounded-xl border border-accent/40 bg-card/95 p-3 shadow-[0_8px_30px_rgba(0,0,0,0.5)] backdrop-blur-sm sm:w-56 lg:w-60"
-      >
-        <p className="font-mono text-[0.7rem] tracking-[0.15em] text-accent">
-          {milestone.year}
-          {milestone.age ? ` · AGE ${milestone.age}` : ""}
-        </p>
-        <p className="mt-0.5 font-display text-base uppercase leading-tight text-foreground">
-          {milestone.location}
-        </p>
-        <p className="mt-0.5 font-mono text-[0.65rem] uppercase tracking-[0.1em] text-muted-foreground">
-          {milestone.label}
-        </p>
-        <p className="mt-1.5 text-[0.8rem] leading-snug text-foreground/85">{milestone.description}</p>
-      </div>
+      {/* Info card — only exists while a node is hovered/tapped; this is the
+          ONLY place it renders, so there is never more than one on screen
+          and the resting state (hovered === null) shows nothing at all.
+          pointer-events-none so the card itself never steals the mouseleave
+          that would otherwise fight with reading it. Keyed by index so it
+          fully remounts (not just re-styles) when the hovered node changes. */}
+      {hovered !== null ? (
+        <div
+          key={hovered}
+          style={panelStyle(JOURNEY_LAYOUT[hovered]!)}
+          className="pointer-events-none absolute z-20 w-44 max-w-[calc(100vw-2rem)] animate-fade-in rounded-xl border border-accent/40 bg-card/95 p-3 shadow-[0_8px_30px_rgba(0,0,0,0.5)] backdrop-blur-sm sm:w-56 lg:w-60"
+        >
+          <p className="font-mono text-[0.7rem] tracking-[0.15em] text-accent">
+            {entries[hovered]!.year}
+            {entries[hovered]!.age ? ` · AGE ${entries[hovered]!.age}` : ""}
+          </p>
+          <p className="mt-0.5 font-display text-base uppercase leading-tight text-foreground">
+            {entries[hovered]!.location}
+          </p>
+          <p className="mt-0.5 font-mono text-[0.65rem] uppercase tracking-[0.1em] text-muted-foreground">
+            {entries[hovered]!.label}
+          </p>
+          <p className="mt-1.5 text-[0.8rem] leading-snug text-foreground/85">
+            {entries[hovered]!.description}
+          </p>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -719,7 +837,9 @@ function TraitModal({ trait, onClose }: { trait: { trait: string; text: string }
 
 function Player({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) {
   const c = content.intro;
-  const [activeJourney, setActiveJourney] = useState(0);
+  // null = no journey card shown, the default resting state. Hover shows a
+  // node's card; leaving it (or tapping the same node again) clears it.
+  const [hoveredJourney, setHoveredJourney] = useState<number | null>(null);
   const [activeTrait, setActiveTrait] = useState<number | null>(null);
 
   // Rendered in two places (phone nav row / desktop row end), one of which is
@@ -827,6 +947,13 @@ function Player({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) 
                       <PhotoSlot photo={{ label: p.label, src: p.src ?? "" }} ratio="aspect-square" />
                     </div>
                   ))}
+                  {/* Portrait's own rail is desktop/tablet-only (see OpeningPortrait) —
+                      below lg it joins this same page-level strip instead of being
+                      anchored inside Journey, so photos stay Journey's siblings on
+                      every breakpoint, not just desktop. */}
+                  <div className="w-11 shrink-0">
+                    <PhotoSlot photo={{ label: c.portrait.label, src: c.portrait.src ?? "" }} ratio="aspect-square" />
+                  </div>
                 </div>
 
                 <Reveal delay={40}>
@@ -842,7 +969,13 @@ function Player({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) 
               </div>
 
               <Reveal delay={160} className="relative min-h-0 flex-1">
-                <Journey entries={c.journey} active={activeJourney} onSelect={setActiveJourney} />
+                <Journey
+                  entries={c.journey}
+                  hovered={hoveredJourney}
+                  onEnter={setHoveredJourney}
+                  onLeave={(i) => setHoveredJourney((h) => (h === i ? null : h))}
+                  onToggle={(i) => setHoveredJourney((h) => (h === i ? null : i))}
+                />
               </Reveal>
             </div>
 

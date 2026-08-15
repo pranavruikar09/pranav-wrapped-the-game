@@ -64,6 +64,7 @@ export const content = {
         label: "WHERE IT STARTED",
         description: "Born in Salwadgaon, a small village in Maharashtra.",
         kind: "start",
+        icon: "home",
       },
       {
         year: "2005",
@@ -73,6 +74,7 @@ export const content = {
         description:
           "Moved to a hostel at the age of four. Apparently, independence started early.",
         kind: "normal",
+        icon: "hostel",
       },
       {
         year: "2009",
@@ -82,6 +84,7 @@ export const content = {
         description:
           "Returned to Shevgaon, my hometown. Completed the rest of my schooling here until Class 10.",
         kind: "normal",
+        icon: "home",
       },
       {
         year: "2012",
@@ -89,6 +92,7 @@ export const content = {
         label: "HOUSE CAPTAIN",
         description: "Became House Captain.",
         kind: "sub",
+        icon: "shield",
       },
       {
         year: "2014",
@@ -96,6 +100,7 @@ export const content = {
         label: "HEAD BOY",
         description: "Became School Head Boy.",
         kind: "sub",
+        icon: "crown",
       },
       {
         year: "2015",
@@ -103,6 +108,7 @@ export const content = {
         label: "THE PLAN",
         description: "Moved to Pune for JEE preparation.",
         kind: "normal",
+        icon: "book",
       },
       {
         year: "2015",
@@ -110,6 +116,7 @@ export const content = {
         label: "FIRST BLUNDER",
         description: "Didn't clear JEE. Not quite the move I'd planned.",
         kind: "blunder",
+        icon: "x",
       },
       {
         year: "2016",
@@ -118,6 +125,7 @@ export const content = {
         description:
           "Joined a Government College in Karad. Electronics & Telecommunication Engineering.",
         kind: "normal",
+        icon: "circuit",
       },
       {
         year: "2022",
@@ -125,6 +133,7 @@ export const content = {
         label: "ROBOTICS CLUB",
         description: "President of the Robotics Club.",
         kind: "sub",
+        icon: "robot",
       },
       {
         year: "2023",
@@ -132,6 +141,7 @@ export const content = {
         label: "INDOOR GAMES",
         description: "Head of the Indoor Games Committee.",
         kind: "sub",
+        icon: "trophy",
       },
       {
         year: "2024",
@@ -139,6 +149,7 @@ export const content = {
         label: "FIRST JOB",
         description: "Joined Lear Corporation for my first job.",
         kind: "normal",
+        icon: "briefcase",
       },
       {
         year: "2025",
@@ -146,6 +157,7 @@ export const content = {
         label: "ANOTHER BLUNDER",
         description: "Didn't clear CAT on my first attempt.",
         kind: "blunder",
+        icon: "x",
       },
       {
         year: "2026",
@@ -153,6 +165,7 @@ export const content = {
         label: "CURRENT POSITION",
         description: "Joined my dream college — IIM Mumbai.",
         kind: "current",
+        icon: "graduation",
       },
     ] as {
       year: string;
@@ -161,6 +174,19 @@ export const content = {
       label: string;
       description: string;
       kind: "start" | "normal" | "sub" | "blunder" | "current";
+      /** Presentation-only — which small line icon the timeline node shows. */
+      icon:
+        | "home"
+        | "hostel"
+        | "shield"
+        | "crown"
+        | "book"
+        | "x"
+        | "circuit"
+        | "robot"
+        | "trophy"
+        | "briefcase"
+        | "graduation";
     }[],
     /** What the journey made you, not a repeat of the journey itself. */
     traits: [
