@@ -1306,24 +1306,25 @@ function PassionModal({ item, onClose }: { item: PassionItem; onClose: () => voi
 }
 
 /**
- * A small photo strip — a sibling of the passion-card grid, not a child of
- * it. Fixed image height (not aspect-ratio) keeps its footprint small and
- * predictable regardless of column width, since the card grid above it
- * still owns most of the vertical budget.
+ * Supporting photo rail — a sibling of the passion-card grid, never a child
+ * of it and never a row beneath it. Rendered ONCE: at lg+ it is a narrow
+ * vertical column beside the cards (four equal rows sharing the grid's
+ * height); below lg, where there is no lateral room, the same single
+ * instance reflows into a compact strip. One DOM node per photo either way.
  */
-function PassionGallery({ photos }: { photos: Photo[] }) {
+function PassionPhotoRail({ photos }: { photos: Photo[] }) {
   return (
-    <div className="grid shrink-0 grid-cols-4 gap-2 sm:gap-3">
+    <div className="grid h-full grid-cols-4 gap-2 lg:grid-cols-1 lg:grid-rows-4 lg:gap-2.5">
       {photos.map((photo) => (
-        <figure key={photo.label} className="group m-0">
-          <div className="h-14 w-full overflow-hidden rounded-lg border border-border/70 transition-colors duration-300 group-hover:border-accent/60 sm:h-16 lg:h-20">
+        <figure key={photo.label} className="group m-0 flex min-h-0 flex-col">
+          <div className="h-14 min-h-0 w-full overflow-hidden rounded-lg border border-border/70 transition-colors duration-300 group-hover:border-accent/60 sm:h-16 lg:h-auto lg:flex-1">
             <img
               src={photo.src}
               alt={photo.label}
               className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
           </div>
-          <figcaption className="mt-1 text-center font-mono text-[0.55rem] tracking-[0.2em] text-muted-foreground sm:text-[0.6rem]">
+          <figcaption className="mt-1 shrink-0 text-center font-mono text-[0.55rem] tracking-[0.2em] text-muted-foreground sm:text-[0.6rem]">
             {photo.label}
           </figcaption>
         </figure>
@@ -1396,8 +1397,10 @@ function Passions({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }
           </Reveal>
         }
       >
-        {/* lg:pr-* keeps the card grid clear of the fixed chapter rail on the right. */}
-        <div className="mx-auto flex h-full min-h-0 w-full max-w-6xl flex-col gap-3 lg:pr-32">
+        {/* lg:pr-* keeps the content clear of the fixed chapter rail on the right.
+            max-w-7xl (up from 6xl) reclaims the unused side gutters so the photo
+            rail gets its own column without the cards giving up much width. */}
+        <div className="mx-auto flex h-full min-h-0 w-full max-w-7xl flex-col gap-3 lg:pr-32">
           <div className="shrink-0">
             <Reveal>
               <h2 className="max-w-4xl font-display text-[clamp(1.5rem,4vw,2.75rem)] uppercase leading-[0.92]">
@@ -1411,18 +1414,23 @@ function Passions({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }
             </Reveal>
           </div>
 
-          <div className="grid min-h-0 flex-1 grid-cols-2 grid-rows-3 gap-2 sm:gap-3">
-            {c.items.map((item, i) => (
-              <Reveal key={item.id} delay={160 + i * 60} className="min-h-0">
-                <PassionCard item={item} onOpen={() => setOpenIndex(i)} />
-              </Reveal>
-            ))}
-          </div>
+          {/* PassionSection: the card grid and the photo rail are SIBLINGS laid
+              out side by side from lg up — the rail is a second column beside
+              the cards, not a row beneath them. Below lg it drops under the
+              cards because there is no lateral space at that width. */}
+          <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row lg:gap-4">
+            <div className="grid min-h-0 flex-1 grid-cols-2 grid-rows-3 gap-2 sm:gap-3">
+              {c.items.map((item, i) => (
+                <Reveal key={item.id} delay={160 + i * 60} className="min-h-0">
+                  <PassionCard item={item} onOpen={() => setOpenIndex(i)} />
+                </Reveal>
+              ))}
+            </div>
 
-          {/* Sibling of the card grid above, NOT nested inside any card. */}
-          <Reveal delay={480} className="shrink-0">
-            <PassionGallery photos={c.gallery} />
-          </Reveal>
+            <Reveal delay={480} className="shrink-0 lg:h-full lg:w-[150px]">
+              <PassionPhotoRail photos={c.gallery} />
+            </Reveal>
+          </div>
         </div>
       </ChapterLayout>
 

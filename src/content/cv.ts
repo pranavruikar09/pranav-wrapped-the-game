@@ -49,7 +49,7 @@ export const content = {
      *  alongside the timeline. Page-level content: these are NOT tied to any
      *  journey node. Add real files under /public/Photos and set `src`. */
     photos: [
-      { label: "PHOTO — SMALL-TOWN ROOTS", src: "/Photos/Village.jpeg", caption: "MY VILLAGE" },
+      { label: "PHOTO — SMALL-TOWN ROOTS", src: "/Photos/Village.jpeg", caption: "MY HOMETOWN" },
       { label: "PHOTO — HOSTEL LIFE", src: "/Photos/Hostel.jpeg", caption: "HOSTEL LIFE" },
       { label: "PHOTO — A NEW CHAPTER", src: "/Photos/IIM_Mumbai_cropped.jpg", caption: "A NEW CHAPTER" },
       { label: "PHOTO — FRIENDS", src: "/Photos/Sendoff.jpeg", caption: "MEMORIES ALONG THE WAY" },
