@@ -22,7 +22,6 @@ export function PhotoSlot({
           <img
             src={photo.src}
             alt={photo.caption || photo.label}
-            loading="lazy"
             className="h-full w-full object-cover transition-[filter] duration-400 hover:brightness-110"
           />
         ) : (

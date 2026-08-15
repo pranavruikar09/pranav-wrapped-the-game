@@ -5,7 +5,6 @@ import { MOVES, applyMove, positionAfter, type Piece } from "./chess";
 import { ChapterLayout } from "./ChapterLayout";
 import { PhotoSlot } from "./PhotoSlot";
 import { ChapterTag, Reveal } from "./Reveal";
-import { ScrollReveal } from "./ScrollReveal";
 import { Loader, ProgressRail, SoundToggle } from "./Chrome";
 import { playTick, setSoundEnabled } from "./sound";
 
@@ -1423,24 +1422,24 @@ function TraitMatchCard({
       type="button"
       onClick={onOpen}
       aria-label={`${item.title} — trait analysis`}
-      className="group flex h-full w-full flex-col items-center overflow-hidden rounded-2xl border border-accent/25 bg-card/40 p-3 text-center transition-all duration-300 hover:-translate-y-1 hover:border-accent/60 hover:shadow-[0_0_36px_-16px_var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:p-4"
+      className="group flex h-full w-full flex-col items-center overflow-hidden rounded-2xl border border-accent/25 bg-card/40 p-4 text-center transition-all duration-300 hover:-translate-y-1 hover:border-accent/60 hover:shadow-[0_0_36px_-16px_var(--accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:p-5"
     >
       <span className="font-mono text-[0.6rem] tracking-[0.25em] text-muted-foreground/70">
         {String(index + 1).padStart(2, "0")}
       </span>
-      <span className="mt-1.5 grid h-9 w-9 shrink-0 place-items-center rounded-full border border-accent/40 p-2 text-accent transition-transform duration-300 group-hover:scale-110 sm:h-10 sm:w-10">
+      <span className="mt-2 grid h-9 w-9 shrink-0 place-items-center rounded-full border border-accent/40 p-2 text-accent transition-transform duration-300 group-hover:scale-110 sm:h-10 sm:w-10">
         <AnalysisIcon kind={item.icon} />
       </span>
-      <h3 className="mt-2 font-display text-sm uppercase leading-tight tracking-tight text-foreground sm:text-base lg:text-lg">
+      <h3 className="mt-2.5 font-display text-sm uppercase leading-tight tracking-tight text-foreground sm:text-base lg:text-lg">
         {item.title}
       </h3>
-      <p className="mt-1 line-clamp-3 text-[0.72rem] leading-snug text-muted-foreground transition-colors group-hover:text-foreground/80 sm:line-clamp-none sm:text-[0.8rem]">
+      <p className="mt-1.5 line-clamp-3 text-[0.72rem] leading-snug text-muted-foreground transition-colors group-hover:text-foreground/80 sm:line-clamp-none sm:text-[0.8rem]">
         {item.text}
       </p>
       {/* Fixed height (not aspect-ratio) so the image's contribution to the
-          card's total height is predictable and small — the point of this
-          change is to reduce empty space, not add more. */}
-      <div className="mt-2 h-20 w-full shrink-0 overflow-hidden rounded-lg border border-border/70 sm:h-24">
+          card's total height is predictable — grown from its original 80/96px
+          to fill the room freed by removing the quote block below the cards. */}
+      <div className="mt-3 h-28 w-full shrink-0 overflow-hidden rounded-lg border border-border/70 sm:h-32">
         <img
           src={image}
           alt={item.title}
@@ -1448,7 +1447,7 @@ function TraitMatchCard({
         />
       </div>
       <span
-        className="mt-auto pt-1.5 font-mono text-[0.65rem] uppercase tracking-[0.2em] text-accent opacity-60 transition-opacity group-hover:opacity-100"
+        className="mt-auto pt-2 font-mono text-[0.65rem] uppercase tracking-[0.2em] text-accent opacity-60 transition-opacity group-hover:opacity-100"
         aria-hidden
       >
         View →
@@ -1537,15 +1536,6 @@ function Loreal({ onNext, onPrev }: { onNext: () => void; onPrev: () => void }) 
               </Reveal>
             ))}
           </div>
-
-          <Reveal delay={380} className="shrink-0">
-            <div className="mx-auto max-w-2xl rounded-2xl border border-border bg-card/30 px-4 py-2.5 text-center sm:px-6 sm:py-3">
-              <p className="font-display text-sm italic leading-snug text-foreground sm:text-base lg:text-lg">
-                &ldquo;{c.quote}&rdquo;
-              </p>
-              <p className="mt-1 font-mono text-[0.6rem] tracking-[0.3em] text-accent">— PRANAV</p>
-            </div>
-          </Reveal>
         </div>
       </ChapterLayout>
 
@@ -1677,21 +1667,21 @@ function AnalysisRow({
       type="button"
       onClick={onOpen}
       aria-label={`${item.title} — ${ariaSuffix}`}
-      className="group flex w-full items-start gap-2.5 py-2.5 text-left transition-colors first:pt-0 last:pb-0 sm:gap-3 sm:py-3"
+      className="group flex w-full items-center gap-3 py-5 text-left transition-colors first:pt-0 last:pb-0 sm:gap-4 sm:py-7"
     >
-      <span className={`shrink-0 font-display text-xl leading-none opacity-60 transition-opacity group-hover:opacity-100 sm:text-2xl ${toneText}`}>
+      <span className={`shrink-0 font-display text-2xl leading-none opacity-60 transition-opacity group-hover:opacity-100 sm:text-3xl ${toneText}`}>
         {String(index + 1).padStart(2, "0")}
       </span>
       <span
-        className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border p-1.5 transition-transform duration-300 group-hover:scale-110 sm:h-9 sm:w-9 sm:p-2 ${toneBorder} ${toneText}`}
+        className={`grid h-9 w-9 shrink-0 place-items-center rounded-full border p-2 transition-transform duration-300 group-hover:scale-110 sm:h-11 sm:w-11 ${toneBorder} ${toneText}`}
       >
         <AnalysisIcon kind={item.icon} />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block font-display text-sm uppercase leading-tight tracking-tight text-foreground transition-colors sm:text-base lg:text-lg">
+        <span className="block font-display text-base uppercase leading-tight tracking-tight text-foreground transition-colors sm:text-lg lg:text-xl">
           {item.title}
         </span>
-        <span className="mt-0.5 block text-[0.72rem] leading-snug text-muted-foreground transition-colors group-hover:text-foreground/80 sm:text-[0.8rem]">
+        <span className="mt-1 block text-[0.78rem] leading-snug text-muted-foreground transition-colors group-hover:text-foreground/80 sm:text-sm">
           {item.text}
         </span>
       </span>
@@ -1736,7 +1726,11 @@ function AnalysisPanel({
         </span>
         <h3 className={`font-display text-lg uppercase tracking-tight sm:text-xl ${toneText}`}>{title}</h3>
       </div>
-      <div className="mt-1 min-h-0 flex-1 divide-y divide-border/50 overflow-hidden text-foreground sm:mt-2">
+      {/* flex + justify-evenly spreads the 3 rows across the panel's full
+          height with even breathing room above, between and below — instead
+          of block-stacking them at the top and leaving the remainder of the
+          flex-1 container empty below. */}
+      <div className="mt-1 flex min-h-0 flex-1 flex-col justify-evenly divide-y divide-border/50 overflow-hidden text-foreground sm:mt-2">
         {items.map((item, i) => (
           <AnalysisRow
             key={item.title}
@@ -1948,13 +1942,13 @@ function WrappedCard({ index, card }: { index: number; card: WrappedCardData }) 
 
   return (
     <div
-      className={`group flex h-full flex-col overflow-hidden rounded-2xl border bg-card/40 p-4 transition-all duration-300 hover:-translate-y-1 sm:p-5 ${toneBorder} ${toneGlow}`}
+      className={`group flex h-full flex-col overflow-hidden rounded-2xl border bg-card/40 p-2 transition-all duration-300 hover:-translate-y-1 sm:p-2.5 ${toneBorder} ${toneGlow}`}
     >
-      <p className={`font-mono text-[0.62rem] tracking-[0.25em] ${toneText}`}>
+      <p className={`font-mono text-[0.6rem] tracking-[0.2em] ${toneText}`}>
         {String(index + 1).padStart(2, "0")} / {card.label}
       </p>
 
-      <div className="mt-3 flex-1">
+      <div className="mt-1 flex-1">
         {card.kind === "music" ? (
           <>
             <div className="flex items-center justify-between gap-3">
@@ -1966,7 +1960,7 @@ function WrappedCard({ index, card }: { index: number; card: WrappedCardData }) 
                 ▶
               </span>
             </div>
-            <h3 className="mt-3 font-display text-2xl uppercase leading-[0.9] sm:text-3xl">
+            <h3 className="mt-1.5 font-display text-lg uppercase leading-[0.9] sm:text-xl">
               {card.song}
             </h3>
             <p className="mt-0.5 font-mono text-xs tracking-[0.2em] text-muted-foreground">
@@ -1980,17 +1974,17 @@ function WrappedCard({ index, card }: { index: number; card: WrappedCardData }) 
               <span className="text-accent">VS</span>
               <span className="text-right">{card.teamB}</span>
             </div>
-            <p className="mt-2 text-center font-display text-4xl leading-none text-accent sm:text-5xl">
+            <p className="mt-1 text-center font-display text-2xl leading-none text-accent sm:text-3xl">
               {card.score}
             </p>
-            <div className="mt-2 flex items-center justify-center gap-2 font-mono text-[0.58rem] uppercase tracking-[0.2em] text-muted-foreground">
+            <div className="mt-1 flex items-center justify-center gap-2 font-mono text-[0.58rem] uppercase tracking-[0.2em] text-muted-foreground">
               <span aria-hidden>♞</span>
               {card.round} · MATCH ANALYSIS
             </div>
           </>
         ) : card.kind === "thought" ? (
           <div className="flex items-start justify-between gap-3">
-            <h3 className="font-display text-2xl uppercase leading-[0.95] sm:text-3xl">
+            <h3 className="font-display text-lg uppercase leading-[0.95] sm:text-xl">
               {card.text}
             </h3>
             <div
@@ -2007,7 +2001,7 @@ function WrappedCard({ index, card }: { index: number; card: WrappedCardData }) 
           </div>
         ) : card.kind === "mistake" ? (
           <div className="flex items-start justify-between gap-3">
-            <h3 className="font-display text-xl uppercase leading-[0.95] text-destructive sm:text-2xl">
+            <h3 className="font-display text-base uppercase leading-[0.95] text-destructive sm:text-lg">
               {card.text}
             </h3>
             <span className="mt-0.5 shrink-0 text-lg text-destructive" aria-hidden>
@@ -2017,24 +2011,27 @@ function WrappedCard({ index, card }: { index: number; card: WrappedCardData }) 
         ) : card.kind === "twist" ? (
           <div className="text-center">
             <p className="font-mono text-xs tracking-[0.3em] text-muted-foreground">{card.from}</p>
-            <p className="my-1 text-accent" aria-hidden>
+            <p className="my-0.5 text-accent" aria-hidden>
               ↓
             </p>
-            <h3 className="font-display text-2xl uppercase leading-[0.95] text-accent sm:text-3xl">
+            <h3 className="font-display text-lg uppercase leading-[0.95] text-accent sm:text-xl">
               {card.to}
             </h3>
           </div>
         ) : (
-          <PhotoSlot photo={card.photo} ratio="aspect-[16/10]" className="mb-2" />
+          // `ratio` is just inserted as a class string — a fixed height here
+          // (rather than an aspect-ratio) keeps this card's contribution to
+          // its row predictable, matching the other five compact cards.
+          <PhotoSlot photo={card.photo} ratio="h-16 sm:h-20" className="mb-1" />
         )}
       </div>
 
       {card.kind === "experience" ? (
-        <h3 className="mt-1 font-display text-lg uppercase leading-tight sm:text-xl">
+        <h3 className="mt-1 font-display text-sm uppercase leading-tight sm:text-base">
           {card.title}
         </h3>
       ) : null}
-      <p className="mt-2 text-[0.78rem] leading-snug text-muted-foreground transition-colors group-hover:text-foreground/80">
+      <p className="mt-1 text-[0.7rem] leading-snug text-muted-foreground transition-colors group-hover:text-foreground/80">
         {card.caption}
       </p>
     </div>
@@ -2043,19 +2040,19 @@ function WrappedCard({ index, card }: { index: number; card: WrappedCardData }) 
 
 function FinalWrappedCard({ final }: { final: typeof content.wrapped.final }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-accent/40 bg-card/60 p-6 text-center shadow-[0_0_50px_-22px_var(--accent)] sm:p-8">
+    <div className="relative overflow-hidden rounded-2xl border border-accent/40 bg-card/60 p-2 text-center shadow-[0_0_50px_-22px_var(--accent)] sm:p-2.5">
       <div className="grain pointer-events-none absolute inset-0 opacity-20" aria-hidden />
       <p className="relative font-mono text-xs tracking-[0.3em] text-accent">{final.label}</p>
-      <span className="relative mt-3 inline-block text-3xl text-accent sm:text-4xl" aria-hidden>
+      <span className="relative mt-1 inline-block text-lg text-accent sm:text-xl" aria-hidden>
         ♚
       </span>
-      <h3 className="relative mt-3 font-display text-2xl uppercase leading-[0.95] sm:text-4xl">
+      <h3 className="relative mt-1 font-display text-base uppercase leading-[0.95] sm:text-lg lg:text-xl">
         {final.lines[0]}
       </h3>
-      <h3 className="relative mt-1 font-display text-2xl uppercase leading-[0.95] text-accent sm:text-4xl">
+      <h3 className="relative mt-0.5 font-display text-base uppercase leading-[0.95] text-accent sm:text-lg lg:text-xl">
         {final.lines[1]}
       </h3>
-      <span className="relative mt-4 inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-4 py-1.5 font-mono text-xs uppercase tracking-[0.25em] text-accent">
+      <span className="relative mt-1.5 inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-3 py-0.5 font-mono text-xs uppercase tracking-[0.25em] text-accent">
         {final.tag} <span aria-hidden>♥</span>
       </span>
     </div>
@@ -2068,7 +2065,6 @@ function Wrapped({ onNext, onPrev }: { onNext: () => void; onPrev: () => void })
   return (
     <ChapterLayout
       id="wrapped"
-      scrollContent
       header={
         // Same lg:pl-24 clearance pattern used on Blunder/Loreal's headers.
         <div className="flex min-h-11 items-center justify-between gap-4 lg:min-h-0 lg:pl-24">
@@ -2083,56 +2079,54 @@ function Wrapped({ onNext, onPrev }: { onNext: () => void; onPrev: () => void })
           </Reveal>
         </div>
       }
-      footer={
-        <Reveal delay={120} className="flex items-center justify-between gap-3">
-          <PrevMoveButton onClick={onPrev} />
-          <p className="hidden flex-1 text-center font-mono text-[0.65rem] uppercase tracking-[0.25em] text-muted-foreground sm:block">
-            ↓ scroll for the full recap
-          </p>
-          <NextMoveButton onClick={onNext} />
-        </Reveal>
-      }
+      footer={<MoveNav onPrev={onPrev} onNext={onNext} />}
     >
-      {/* This is the one chapter that scrolls — everything below lives inside
-          ChapterLayout's scrollContent pane, not the fixed centered column
-          every other chapter uses. lg:pr-32 still clears the right rail. */}
-      <div className="mx-auto w-full max-w-6xl pb-2 lg:pr-32">
-        <div className="pt-2 text-center sm:pt-4">
+      {/* justify-center groups hero + cards + final card + outro as one block
+          and centres it — same fixed, no-scroll pattern every other chapter
+          uses, once every piece here is compact enough to actually fit it (true
+          from lg up, where this was verified against the desktop requirement).
+          Below lg the 6 cards stack into one column and no longer fit — rather
+          than clip them, this falls back to a top-aligned, internally
+          scrollable column (justify-center's overflow-scroll behaviour is
+          unreliable in flexbox, hence justify-start instead of centering an
+          overflowing box). */}
+      <div className="mx-auto flex h-full min-h-0 w-full max-w-6xl flex-col justify-start gap-1 overflow-y-auto lg:justify-center lg:overflow-hidden lg:pr-32">
+        <div className="shrink-0 text-center">
           <Reveal>
             <p className="font-mono text-xs tracking-[0.3em] text-muted-foreground">{c.eyebrow}</p>
           </Reveal>
           <Reveal delay={60}>
-            <h2 className="mt-1 font-display text-[clamp(2.5rem,9vw,5rem)] uppercase leading-[0.85]">
+            <h2 className="mt-0.5 font-display text-[clamp(1.5rem,4.5vw,2.5rem)] uppercase leading-[0.85]">
               <span className="text-accent">{content.name}</span> WRAPPED
             </h2>
           </Reveal>
           <Reveal delay={110}>
-            <p className="mx-auto mt-2 max-w-xl font-mono text-xs tracking-[0.2em] text-muted-foreground sm:text-sm">
+            <p className="mx-auto mt-0.5 max-w-xl font-mono text-xs tracking-[0.2em] text-muted-foreground sm:text-sm">
               {c.subtitle}
             </p>
           </Reveal>
         </div>
 
-        <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
+        <div className="grid shrink-0 grid-cols-1 gap-1 sm:grid-cols-2 sm:gap-1.5 lg:grid-cols-3">
           {c.cards.map((card, i) => (
-            <ScrollReveal key={card.label} delay={(i % 3) * 60}>
+            <Reveal key={card.label} delay={160 + (i % 3) * 50} className="h-full">
               <WrappedCard index={i} card={card} />
-            </ScrollReveal>
+            </Reveal>
           ))}
         </div>
 
-        <ScrollReveal className="mt-4">
+        <Reveal delay={340} className="shrink-0">
           <FinalWrappedCard final={c.final} />
-        </ScrollReveal>
+        </Reveal>
 
-        <ScrollReveal delay={80} className="mt-6 pb-6 text-center">
-          <p className="font-display text-xl uppercase tracking-tight sm:text-2xl">
+        <Reveal delay={400} className="shrink-0 text-center">
+          <p className="font-display text-sm uppercase tracking-tight sm:text-base">
             {c.outro.thanks}
           </p>
-          <p className="mt-1 font-mono text-xs tracking-[0.25em] text-accent sm:text-sm">
+          <p className="mt-0.5 font-mono text-[0.7rem] tracking-[0.25em] text-accent sm:text-xs">
             {c.outro.line}
           </p>
-        </ScrollReveal>
+        </Reveal>
       </div>
     </ChapterLayout>
   );

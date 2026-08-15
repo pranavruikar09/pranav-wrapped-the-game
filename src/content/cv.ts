@@ -347,8 +347,6 @@ export const content = {
         image: "/Photos/Cerave3.jpeg",
       },
     ] as { title: string; text: string; icon: "flask" | "shield" | "puzzle"; image: string }[],
-    quote:
-      "I may not always be the loudest voice, but I aim to be the person you can rely on when it really matters.",
     /** One small Wrapped-style stat — kept to a single data point on purpose. */
     stat: { label: "NO-NONSENSE INDEX", value: "98%" },
     moveCaption: "NO FLASHY MOVES. JUST THE RIGHT ONES.",
@@ -448,7 +446,7 @@ export const content = {
         label: "MOST UNDERRATED EXPERIENCE",
         title: "A TREK TO KALUSUBAI PEAK",
         caption: "No deadlines. No notifications. Just a very long climb and a much better view.",
-        photo: { label: "PHOTO — KALUSUBAI PEAK", src: "" } as Photo,
+        photo: { label: "PHOTO — KALUSUBAI PEAK", src: "/Photos/Trek.jpeg" } as Photo,
       },
     ] as WrappedCard[],
     final: {
